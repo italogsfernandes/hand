@@ -1,3 +1,13 @@
+matlab-hand-moviments-classifier/adriano*
+datasets/no-sync/*
+no-sync/
+
+# Coletas dos voluntários
+# Não são compartilhados devido a privacidade
+# da pessoa que fez a coleta
+datasets/coletas/*
+python-hand-moviments-classifier/*.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
