@@ -17,13 +17,13 @@ HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "F
 #%% Importing the dataset
 # TODO: perguntar julia sobre os protocolos dessas coletas,
 # por que 11, 12, 13, 14, 21, 22, 23, 24?
-file_name = '../datasets/coletas/Eber/Eber11-Final.txt'
+file_name = '../../datasets/coletas/Eber/Eber11-Final.txt'
 dataset = pd.read_table(file_name, sep=';', header=None)
 dataset.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
 emg_channels = dataset.iloc[:, :-2].values
 emg_trigger = dataset.iloc[:, -2].values
 
-file_name_targets = '../datasets/coletas/Eber/Eber11-Resposta.txt'
+file_name_targets = '../../datasets/coletas/Eber/Eber11-Resposta.txt'
 targets = pd.read_table(file_name_targets, header=None)
 targets = targets.iloc[:, :].values.ravel()
 targets_str = []
@@ -178,7 +178,29 @@ for i in range(len(targets)):
 # RMS ZC VAR SSC TARGET
 #X = np.append(arr=rms, values=zc, axis=1)
 X = rms # testando somente com rms como entrada
-y = targets # saida = targets
+#y = targets # saida = targets
+#y = y.reshape(-1,1).astype(float)
+
+y = np.array(targets_str)
+
+#y = np.zeros((targets.shape[0],6),dtype=bool)
+
+#for n in range(1,7):
+#    y[:,n-1] = (targets == n).astype(bool)
+
+# Encoding categorical data
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+labelencoder_Y = LabelEncoder()
+labelencoder_Y.fit(HAND_MOVIMENTS_NAMES)
+y = labelencoder_Y.transform(y)
+#onehotencoder = OneHotEncoder(categorical_features = [0])
+#y = onehotencoder.fit_transform(y).toarray()
+
+#%%
+y = np.zeros((targets.shape[0],6),dtype=bool)
+
+for n in range(6):
+    y[:,n] = (targets == n).astype(bool)
 
 #%% Splitting the dataset into the Training set and Test set
 from sklearn.model_selection import train_test_split
@@ -196,30 +218,32 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense
 
-#%% Initialising the ANN
+# Initialising the ANN
 classifier = Sequential()
 
-#%% Adding the layers
+# Adding the layers
 # Adding the input layer and the first hidden layer
 # 4 entradas RMS_ch1, RMS_ch2, RMS_ch3, RMS_ch4
-classifier.add(Dense(output_dim = 4, init = 'uniform', activation = 'relu', input_dim = 11))
+classifier.add(Dense(output_dim = 6, init = 'uniform', activation = 'relu', input_dim = 4))
 # Adding the second hidden layer
 classifier.add(Dense(output_dim = 6, init = 'uniform', activation = 'relu'))
 # Adding the output layer
 classifier.add(Dense(output_dim = 6, init = 'uniform', activation = 'sigmoid'))
 
-#%% Compiling the ANN
+# Compiling the ANN
 classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 
 #%% Fitting the ANN to the Training set
-classifier.fit(X_train, y_train, batch_size = 10, nb_epoch = 100)
+classifier.fit(X_train, y_train, batch_size = 10, nb_epoch = 100, verbose=1)
 
 #%% Making the predictions and evaluating the model
 
 #%% Predicting the Test set results
-y_pred = classifier.predict(X_test)
-y_pred = (y_pred > 0.5)
-
+y_pred = classifier.predict_classes(X[0:5,:])
+#y_pred = classifier.predict(X_train,verbose=1)
+#%%
+y_pred
+#%%
+targets[0:5]
+#y_test[0].astype(int)
 #%% Making the Confusion Matrix
-from sklearn.metrics import confusion_matrix
-cm = confusion_matrix(y_test, y_pred)
