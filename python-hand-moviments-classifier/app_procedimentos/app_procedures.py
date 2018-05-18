@@ -41,14 +41,7 @@ emg_trigger_corrected = np.append(arr = np.zeros(delay_trigger),
                                   values = emg_trigger[:-delay_trigger])
 
 #%% Optional: Plotting the data
-"""
-    Estender
-    Supinar
-    Pronar
-    Fechar
-    Flexionar
-    Pinçar
-"""
+'''
 fig = plt.figure()
 axes = [None for i in range(4)]
 for i in range(4):
@@ -65,7 +58,7 @@ axes[0].set_xticklabels([])
 axes[1].set_xticklabels([])
 axes[2].set_xticklabels([])
 plt.show()
-
+'''
 #%% Filtering
 # TODO: Perguntar a julia sobre a filtragem, quais filtros tenho que passar?
 # quais frequencias? quais caracteristicas?
@@ -106,6 +99,7 @@ for ch in range(4):
     emg_smooth[:, ch] = signal.filtfilt(b3, a3, emg_retificado[:, ch]) # Passa um filtro PASSA-BAIXA no SINAL retificado
 
 #%% Optional: Testando filtros
+'''
 plt.subplot(2,1,1)
 plt.plot(emg_channels[12000:80000,0])
 plt.grid()
@@ -116,7 +110,7 @@ plt.plot(emg_filtered_dc[12000:80000,0])
 #plt.plot(emg_smooth[12000:80000,0])
 plt.grid()
 plt.show()
-
+'''
 #%% Contraction sites
 contractions_onsets = []
 contractions_offsets = []
@@ -175,9 +169,10 @@ for i in range(len(targets)):
 #
 #TODO: terminar a extração de caracteristicas
 #%% Dataset Pre-processed
-# RMS ZC VAR SSC TARGET
-#X = np.append(arr=rms, values=zc, axis=1)
-X = rms # testando somente com rms como entrada
+X = np.append(arr=rms, values=zc, axis=1)
+X = np.append(arr=X, values=mav, axis=1)
+X = np.append(arr=X, values=var, axis=1)
+#X = rms # testando somente com rms como entrada
 #y = targets # saida = targets
 #y = y.reshape(-1,1).astype(float)
 
@@ -224,9 +219,9 @@ classifier = Sequential()
 # Adding the layers
 # Adding the input layer and the first hidden layer
 # 4 entradas RMS_ch1, RMS_ch2, RMS_ch3, RMS_ch4
-classifier.add(Dense(output_dim = 6, init = 'uniform', activation = 'relu', input_dim = 4))
+classifier.add(Dense(output_dim = 29, init = 'uniform', activation = 'relu', input_dim = 16))
 # Adding the second hidden layer
-classifier.add(Dense(output_dim = 6, init = 'uniform', activation = 'relu'))
+classifier.add(Dense(output_dim = 13, init = 'uniform', activation = 'relu'))
 # Adding the output layer
 classifier.add(Dense(output_dim = 6, init = 'uniform', activation = 'sigmoid'))
 
@@ -239,11 +234,36 @@ classifier.fit(X_train, y_train, batch_size = 10, nb_epoch = 100, verbose=1)
 #%% Making the predictions and evaluating the model
 
 #%% Predicting the Test set results
-y_pred = classifier.predict_classes(X[0:5,:])
+y_pred = classifier.predict_classes(X_train)#.reshape(48,1)
 #y_pred = classifier.predict(X_train,verbose=1)
+
+# confusion matrix
 #%%
-y_pred
-#%%
-targets[0:5]
-#y_test[0].astype(int)
+def get_labeled_matriz(sparce):
+    dense = np.zeros((sparce.shape[0],1))
+    for i in range(sparce.shape[0]):
+        ind = np.where(sparce[i,:] == (sparce[i,:]).max())[0][0]
+        dense[i] = ind + 1
+    return dense
+
 #%% Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+y_pred_l = y_pred#get_labeled_matriz(y_pred)
+y_test_l = get_labeled_matriz(y_train)
+cm = confusion_matrix(y_test_l, y_pred_l)
+
+cole = np.append(arr=y_pred_l, values=y_test_l, axis=1)
+#%%
+lines = np.zeros((6,1))
+columns = np.zeros((1,7))
+total_acertos = 0
+
+for i in range(6):
+    lines[i,0] = cm[i,i] / np.sum(cm[i,:])
+    columns[0,i] = cm[i,i] / np.sum(cm[:,i])
+    total_acertos += cm[i,i]
+
+t_acc = total_acertos / np.sum(cm)
+columns[0,6] = t_acc
+cm2 = np.append(arr=cm, values=lines, axis=1)
+cm2 = np.append(arr=cm2, values=columns, axis=0)
