@@ -112,21 +112,21 @@ class SignalGenerator_t {
         case REPOUSO_WAVE:
           break;
         case SUPINAR_WAVE:
-          _qnt_points = 7043;
+          _qnt_points = 3521;
         case PRONAR_WAVE:
-          _qnt_points = 7022;
+          _qnt_points = 3511;
           break;
         case PINCAR_WAVE:
-          _qnt_points = 7022;
+          _qnt_points = 3511;
           break;
         case FECHAR_WAVE:
-          _qnt_points = 7012;
+          _qnt_points = 3506;
           break;
         case ESTENDER_WAVE:
-          _qnt_points = 7012;
+          _qnt_points = 3506;
           break;
         case FLEXIONAR_WAVE:
-          _qnt_points = 7022;
+          _qnt_points = 3511;
           break;
       }
     }
