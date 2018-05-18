@@ -17,13 +17,13 @@ END_TARGET = 12
 #%% Importing the dataset
 # TODO: perguntar julia sobre os protocolos dessas coletas,
 # por que 11, 12, 13, 14, 21, 22, 23, 24?
-file_name = '../datasets/coletas/Eber/Eber11-Final.txt'
+file_name = '../../datasets/coletas/Eber/Eber11-Final.txt'
 dataset = pd.read_table(file_name, sep=';', header=None)
 dataset.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
 emg_channels = dataset.iloc[:, :-2].values
 emg_trigger = dataset.iloc[:, -2].values
 
-file_name_targets = '../datasets/coletas/Eber/Eber11-Resposta.txt'
+file_name_targets = '../../datasets/coletas/Eber/Eber11-Resposta.txt'
 targets = pd.read_table(file_name_targets, header=None)
 targets = targets.iloc[:, :].values.ravel()
 targets_str = []
@@ -59,6 +59,7 @@ for i in range(START_TARGET,END_TARGET):
         arduino_emg_sinals[-1].append(emg_channels[contractions_onsets[i]:contractions_offsets[i],ch])
 
 #%% plottando os sinais
+'''
 for i in range(START_TARGET,END_TARGET):
     fig = plt.figure()
     axes = [None for i in range(4)]
@@ -76,6 +77,7 @@ for i in range(START_TARGET,END_TARGET):
     axes[2].set_xticklabels([])
     fig.suptitle(targets_str[i])
 plt.show()
+'''
 #%% Normalizando os sinais
 max_emg = []
 min_emg = []
@@ -104,16 +106,16 @@ arq.write("""
 // arduino_signal_simulator_gen.py
 """)
 arq.write("#include <avr/pgmspace.h> //for IDE versions below 1.0 (2011)\n")
-          
+fd = 2 # freq divider
+valores_por_linha = 4
 for i in range(START_TARGET,END_TARGET):
     vector_out = ""
     vector_name = targets_str[i].lower()
     q = len(arduino_emg_sinals[i-START_TARGET][0])
-    valores_por_linha = 2
-    vector_header = "const float emg_" + vector_name + "_wave[" +str(q) + "][4] PROGMEM = {\n"
+    vector_header = "const float emg_" + vector_name + "_wave[" +str(np.floor(q/fd).astype(int)) + "][4] PROGMEM = {\n"
     vector_data = "    "
     
-    for k in range(q):
+    for k in range(0,np.floor(q/fd).astype(int),fd):
         vector_data += "{"
         for ch in range(4):
             v = arduino_emg_sinals[i-START_TARGET][ch][k]
@@ -121,10 +123,10 @@ for i in range(START_TARGET,END_TARGET):
             if ch != 3:
                 vector_data += ", "
         vector_data += "}"
-        if k != q-1:
+        if k != (np.floor((q/fd)).astype(int)-fd):
             vector_data += ", "
         if (k+1)%valores_por_linha == 0:
             vector_data += "\n    "
-    vector_out = vector_header + vector_data + "\n};"
+    vector_out = vector_header + vector_data + "\n};\n"
     arq.write(vector_out)
 arq.close()

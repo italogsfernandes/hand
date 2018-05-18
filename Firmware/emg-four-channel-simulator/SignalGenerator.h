@@ -2,17 +2,17 @@
 #define __SignalGenerator__
 
 #include <avr/pgmspace.h> //for IDE versions below 1.0 (2011)
-#include <dados_gerados.h>
+#include "dados_gerados.h"
 
 //Tipos de ondas possiveis de se selecionar
 typedef enum {
-  REPOUSO,
-  SUPINAR,
-  PRONAR,
-  PINCAR,
-  FECHAR,
-  ESTENDER,
-  FLEXIONAR
+  REPOUSO_WAVE,
+  SUPINAR_WAVE,
+  PRONAR_WAVE,
+  PINCAR_WAVE,
+  FECHAR_WAVE,
+  ESTENDER_WAVE,
+  FLEXIONAR_WAVE
 } waveforms_t;
 
 /////////////////////////////////////////
@@ -23,7 +23,7 @@ class SignalGenerator_t {
     waveforms_t _waveform; //Acessible by getter and setter
 
     uint16_t _actual_index; //Index de leitura do vetor de dados
-    float _actual_value; //Valor atual
+    float _actual_value[4]; //Valor atual
     float _offset;
     float _amplitude;
 
@@ -32,52 +32,46 @@ class SignalGenerator_t {
 
     double get_next() {
       switch (_waveform) {
-        case REPOUSO:
+        case REPOUSO_WAVE:
           _actual_value[0] = 0;
           _actual_value[1] = 0;
           _actual_value[2] = 0;
           _actual_value[3] = 0;
-        case SUPINAR:
+        case SUPINAR_WAVE:
           _actual_value[0] = pgm_read_float_near(emg_supinar_wave + _actual_index * _freq_divider);
           _actual_value[1] = pgm_read_float_near(emg_supinar_wave + 1 + _actual_index * _freq_divider);
           _actual_value[2] = pgm_read_float_near(emg_supinar_wave + 2 + _actual_index * _freq_divider);
           _actual_value[3] = pgm_read_float_near(emg_supinar_wave + 3 + _actual_index * _freq_divider);
           break;
-        case PRONAR:
-          _actual_value[0] = pgm_read_float_near(emg_supinar_wave + _actual_index * _freq_divider);
-          _actual_value[1] = pgm_read_float_near(emg_supinar_wave + 1 + _actual_index * _freq_divider);
-          _actual_value[2] = pgm_read_float_near(emg_supinar_wave + 2 + _actual_index * _freq_divider);
-          _actual_value[3] = pgm_read_float_near(emg_supinar_wave + 3 + _actual_index * _freq_divider);
+        case PRONAR_WAVE:
+          _actual_value[0] = pgm_read_float_near(emg_pronar_wave + _actual_index * _freq_divider);
+          _actual_value[1] = pgm_read_float_near(emg_pronar_wave + 1 + _actual_index * _freq_divider);
+          _actual_value[2] = pgm_read_float_near(emg_pronar_wave + 2 + _actual_index * _freq_divider);
+          _actual_value[3] = pgm_read_float_near(emg_pronar_wave + 3 + _actual_index * _freq_divider);
           break;
-        case PINCAR:
-          _actual_value[0] = pgm_read_float_near(emg_supinar_wave + _actual_index * _freq_divider);
-          _actual_value[1] = pgm_read_float_near(emg_supinar_wave + 1 + _actual_index * _freq_divider);
-          _actual_value[2] = pgm_read_float_near(emg_supinar_wave + 2 + _actual_index * _freq_divider);
-          _actual_value[3] = pgm_read_float_near(emg_supinar_wave + 3 + _actual_index * _freq_divider);
+        case PINCAR_WAVE:
+          _actual_value[0] = pgm_read_float_near(emg_pincar_wave + _actual_index * _freq_divider);
+          _actual_value[1] = pgm_read_float_near(emg_pincar_wave + 1 + _actual_index * _freq_divider);
+          _actual_value[2] = pgm_read_float_near(emg_pincar_wave + 2 + _actual_index * _freq_divider);
+          _actual_value[3] = pgm_read_float_near(emg_pincar_wave + 3 + _actual_index * _freq_divider);
           break;
-        case FECHAR:
-          _actual_value[0] = pgm_read_float_near(emg_supinar_wave + _actual_index * _freq_divider);
-          _actual_value[1] = pgm_read_float_near(emg_supinar_wave + 1 + _actual_index * _freq_divider);
-          _actual_value[2] = pgm_read_float_near(emg_supinar_wave + 2 + _actual_index * _freq_divider);
-          _actual_value[3] = pgm_read_float_near(emg_supinar_wave + 3 + _actual_index * _freq_divider);
+        case FECHAR_WAVE:
+          _actual_value[0] = pgm_read_float_near(emg_fechar_wave + _actual_index * _freq_divider);
+          _actual_value[1] = pgm_read_float_near(emg_fechar_wave + 1 + _actual_index * _freq_divider);
+          _actual_value[2] = pgm_read_float_near(emg_fechar_wave + 2 + _actual_index * _freq_divider);
+          _actual_value[3] = pgm_read_float_near(emg_fechar_wave + 3 + _actual_index * _freq_divider);
           break;
-        case ESTENDER:
-          _actual_value[0] = pgm_read_float_near(emg_supinar_wave + _actual_index * _freq_divider);
-          _actual_value[1] = pgm_read_float_near(emg_supinar_wave + 1 + _actual_index * _freq_divider);
-          _actual_value[2] = pgm_read_float_near(emg_supinar_wave + 2 + _actual_index * _freq_divider);
-          _actual_value[3] = pgm_read_float_near(emg_supinar_wave + 3 + _actual_index * _freq_divider);
+        case ESTENDER_WAVE:
+          _actual_value[0] = pgm_read_float_near(emg_estender_wave + _actual_index * _freq_divider);
+          _actual_value[1] = pgm_read_float_near(emg_estender_wave + 1 + _actual_index * _freq_divider);
+          _actual_value[2] = pgm_read_float_near(emg_estender_wave + 2 + _actual_index * _freq_divider);
+          _actual_value[3] = pgm_read_float_near(emg_estender_wave + 3 + _actual_index * _freq_divider);
           break;
-        case FLEXIONAR:
-          _actual_value[0] = pgm_read_float_near(emg_supinar_wave + _actual_index * _freq_divider);
-          _actual_value[1] = pgm_read_float_near(emg_supinar_wave + 1 + _actual_index * _freq_divider);
-          _actual_value[2] = pgm_read_float_near(emg_supinar_wave + 2 + _actual_index * _freq_divider);
-          _actual_value[3] = pgm_read_float_near(emg_supinar_wave + 3 + _actual_index * _freq_divider);
-          break;
-        case SUPINAR:
-          _actual_value[0] = pgm_read_float_near(emg_supinar_wave + _actual_index * _freq_divider);
-          _actual_value[1] = pgm_read_float_near(emg_supinar_wave + 1 + _actual_index * _freq_divider);
-          _actual_value[2] = pgm_read_float_near(emg_supinar_wave + 2 + _actual_index * _freq_divider);
-          _actual_value[3] = pgm_read_float_near(emg_supinar_wave + 3 + _actual_index * _freq_divider);
+        case FLEXIONAR_WAVE:
+          _actual_value[0] = pgm_read_float_near(emg_flexionar_wave + _actual_index * _freq_divider);
+          _actual_value[1] = pgm_read_float_near(emg_flexionar_wave + 1 + _actual_index * _freq_divider);
+          _actual_value[2] = pgm_read_float_near(emg_flexionar_wave + 2 + _actual_index * _freq_divider);
+          _actual_value[3] = pgm_read_float_near(emg_flexionar_wave + 3 + _actual_index * _freq_divider);
           break;
       }
       _actual_value[0] = _actual_value[0] * _amplitude + _offset;
@@ -85,12 +79,11 @@ class SignalGenerator_t {
       _actual_value[2] = _actual_value[2] * _amplitude + _offset;
       _actual_value[3] = _actual_value[3] * _amplitude + _offset;
       ++_actual_index %= (_qnt_points / _freq_divider); //Incremento circular
-      return _actual_value;
     }
 
   public:
     SignalGenerator_t () {
-      _waveform = REPOUSO;
+      _waveform = REPOUSO_WAVE;
       _actual_index = 0;
       _offset = 0;
       _amplitude = 100;
@@ -116,25 +109,24 @@ class SignalGenerator_t {
     void setWaveform(waveforms_t waveform) {
       _waveform = waveform;
       switch (_waveform) {
-        case REPOUSO:
+        case REPOUSO_WAVE:
           break;
-        case SUPINAR:
-          _qnt_points = size(emg_supinar_wave) / size(float);
+        case SUPINAR_WAVE:
+          _qnt_points = 7043;
+        case PRONAR_WAVE:
+          _qnt_points = 7022;
           break;
-        case PRONAR:
-          _qnt_points = size(emg_pronar_wave) / size(float);
+        case PINCAR_WAVE:
+          _qnt_points = 7022;
           break;
-        case PINCAR:
-          _qnt_points = size(emg_pincar_wave) / size(float);
+        case FECHAR_WAVE:
+          _qnt_points = 7012;
           break;
-        case FECHAR:
-          _qnt_points = size(emg_fechar_wave) / size(float);
+        case ESTENDER_WAVE:
+          _qnt_points = 7012;
           break;
-        case ESTENDER:
-          _qnt_points = size(emg_estender_wave) / size(float);
-          break;
-        case FLEXIONAR:
-          _qnt_points = size(emg_flexionar_wave) / size(float);
+        case FLEXIONAR_WAVE:
+          _qnt_points = 7022;
           break;
       }
     }
