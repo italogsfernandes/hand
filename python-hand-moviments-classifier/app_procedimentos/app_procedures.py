@@ -15,7 +15,7 @@ from scipy import signal
 HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "Flexionar"]
 
 #%% Importing the dataset
-# TODO: perguntar julia sobre os protocolos dessas coletas,
+# NOTE: perguntar julia sobre os protocolos dessas coletas,
 # por que 11, 12, 13, 14, 21, 22, 23, 24?
 file_name = '../../datasets/coletas/Eber/Eber11-Final.txt'
 dataset = pd.read_table(file_name, sep=';', header=None)
@@ -36,18 +36,18 @@ delay_trigger = 500
 fs = 2000  # Frequência de amostragem (Hz)fa = 
 
 #%% Correcting the triger
-# TODO: perguntar julia oq vai ser feito desse atraso
+# NOTE perguntar julia oq vai ser feito desse atraso
 emg_trigger_corrected = np.append(arr = np.zeros(delay_trigger),
                                   values = emg_trigger[:-delay_trigger])
 
 #%% Optional: Plotting the data
-'''
+
 fig = plt.figure()
 axes = [None for i in range(4)]
 for i in range(4):
     axes[i] = plt.subplot(4,1,i+1)
     plt.plot(emg_channels[12000:80000,i])
-    plt.plot(emg_trigger_corrected[12000:80000]*100)
+    plt.plot(emg_trigger[12000:80000]*100)
     plt.title('Ch ' + str(i+1))
     plt.ylim((-1000,1000))
     plt.grid()
@@ -58,9 +58,9 @@ axes[0].set_xticklabels([])
 axes[1].set_xticklabels([])
 axes[2].set_xticklabels([])
 plt.show()
-'''
+
 #%% Filtering
-# TODO: Perguntar a julia sobre a filtragem, quais filtros tenho que passar?
+# NOTE: Perguntar a julia sobre a filtragem, quais filtros tenho que passar?
 # quais frequencias? quais caracteristicas?
 
 # Parâmetros para a construção dos filtros
@@ -99,18 +99,18 @@ for ch in range(4):
     emg_smooth[:, ch] = signal.filtfilt(b3, a3, emg_retificado[:, ch]) # Passa um filtro PASSA-BAIXA no SINAL retificado
 
 #%% Optional: Testando filtros
-'''
+
 plt.subplot(2,1,1)
 plt.plot(emg_channels[12000:80000,0])
 plt.grid()
 plt.subplot(2,1,2)
-plt.plot(emg_filtered_dc[12000:80000,0])
+#plt.plot(emg_filtered_dc[12000:80000,0])
 #plt.plot(emg_filtered_60hz[12000:80000,0])
 #plt.plot(emg_retificado[12000:80000,0])
-#plt.plot(emg_smooth[12000:80000,0])
+plt.plot(emg_smooth[12000:80000,0])
 plt.grid()
 plt.show()
-'''
+
 #%% Contraction sites
 contractions_onsets = []
 contractions_offsets = []
@@ -118,9 +118,11 @@ for i in range(1,emg_channels.shape[0]):
     # Borda 0 -> 1
     if emg_trigger_corrected[i-1] < 1 and emg_trigger_corrected[i] >= 1:
         contractions_onsets.append(i)
+        contractions_offsets.append(i+100)
+
     # Borda 1 -> 0
-    if emg_trigger_corrected[i-1] > 1 and emg_trigger_corrected[i] <= 1:
-        contractions_offsets.append(i)
+#    if emg_trigger_corrected[i-1] > 1 and emg_trigger_corrected[i] <= 1:
+ #       contractions_offsets.append(i)
        
 #%% Feature Extraction
 #TODO: Perguntar julia como calcular WL e SSC
@@ -234,8 +236,8 @@ classifier.fit(X_train, y_train, batch_size = 10, nb_epoch = 100, verbose=1)
 #%% Making the predictions and evaluating the model
 
 #%% Predicting the Test set results
-y_pred = classifier.predict_classes(X_train)#.reshape(48,1)
-#y_pred = classifier.predict(X_train,verbose=1)
+#y_pred = classifier.predict_classes(X_test)#.reshape(48,1)
+y_pred = classifier.predict(X_train,verbose=1)
 
 # confusion matrix
 #%%
@@ -248,7 +250,7 @@ def get_labeled_matriz(sparce):
 
 #%% Making the Confusion Matrix
 from sklearn.metrics import confusion_matrix
-y_pred_l = y_pred#get_labeled_matriz(y_pred)
+y_pred_l = get_labeled_matriz(y_pred)
 y_test_l = get_labeled_matriz(y_train)
 cm = confusion_matrix(y_test_l, y_pred_l)
 
