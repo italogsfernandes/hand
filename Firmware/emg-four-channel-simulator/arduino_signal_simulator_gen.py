@@ -17,6 +17,9 @@ END_TARGET = 12
 #%% Importing the dataset
 # TODO: perguntar julia sobre os protocolos dessas coletas,
 # por que 11, 12, 13, 14, 21, 22, 23, 24?
+# 2 posições do eletrodo - encima(1) e embaixo(4)
+# 4 baterias para cada posição
+# NOTE: da pra juntar as baterias juntos pois foi separado para a pessoa nao cansar
 file_name = '../../datasets/coletas/Eber/Eber11-Final.txt'
 dataset = pd.read_table(file_name, sep=';', header=None)
 dataset.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()

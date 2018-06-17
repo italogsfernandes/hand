@@ -27,9 +27,9 @@
 ///////////
 //Timers //
 ///////////
-#define FREQ_AQUIRE          1000                   //Frequency in Hz
-#define INTERVAL_MS_AQUIRE   1000 / FREQ_AQUIRE     //Interval in milliseconds
-#define INTERVAL_US_AQUIRE   1000000 / FREQ_AQUIRE  //Interval in microseconds
+#define FREQ_AQUIRE          500                   //Frequency in Hz
+#define INTERVAL_MS_AQUIRE   500 / FREQ_AQUIRE     //Interval in milliseconds
+#define INTERVAL_US_AQUIRE   500000 / FREQ_AQUIRE  //Interval in microseconds
 
 // Arduino DUE
 #if defined(__arm__) && defined(__SAM3X8E__)
@@ -66,7 +66,7 @@ void setup() {
   
   my_generator.setOffset(512);
   my_generator.setAmplitude(512);
-  my_generator.setWaveform(REPOUSO_WAVE);
+  my_generator.setWaveform(SUPINAR_WAVE);
   
   SETUP_TIMER();
   START_TIMER();
