@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt # Plotting
 from scipy import signal
 
 #%% Adding the path to datasets
-HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "Flexionar"]
+#HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "Flexionar"]
+HAND_MOVIMENTS_NAMES = ["Supination", "Pronation", "Pincer", "Fermer", "Prolonger", "Flex"]
 
 #%% Importing the dataset
 # NOTE: perguntar julia sobre os protocolos dessas coletas,
@@ -33,7 +34,7 @@ for target in targets:
 #%% Constantes dos sinais
 # Tempo de atraso (em amostras) no TRIGER para sincronização SINAL/TRIGGER
 delay_trigger = 500
-fs = 2000  # Frequência de amostragem (Hz)fa = 
+fs = 2000  # Frequência de amostragem (Hz)fa =
 
 #%% Correcting the triger
 # NOTE perguntar julia oq vai ser feito desse atraso
@@ -91,7 +92,7 @@ for ch in range(4):
     emg_filtered_60hz[:,ch] = signal.filtfilt(b1, a1, emg_filtered_dc[:, ch])
 
 # Retifica o SINAL filtrado
-emg_retificado = np.abs(emg_filtered_60hz) 
+emg_retificado = np.abs(emg_filtered_60hz)
 
 # low-pass filtered
 emg_smooth = np.zeros(emg_channels.shape)
@@ -123,7 +124,7 @@ for i in range(1,emg_channels.shape[0]):
     # Borda 1 -> 0
 #    if emg_trigger_corrected[i-1] > 1 and emg_trigger_corrected[i] <= 1:
  #       contractions_offsets.append(i)
-       
+
 #%% Feature Extraction
 #TODO: Perguntar julia como calcular WL e SSC
 rms = np.zeros((len(targets), 4), dtype=float) # root mean square (RMS)
@@ -143,8 +144,8 @@ for i in range(len(targets)):
            )))
         #ZC
         s3= np.sign(
-         emg_filtered_60hz[contractions_onsets[i]:contractions_offsets[i],ch])  
-        s3[s3==0] = -1     # replace zeros with -1  
+         emg_filtered_60hz[contractions_onsets[i]:contractions_offsets[i],ch])
+        s3[s3==0] = -1     # replace zeros with -1
         zc[i,ch] = (np.where(np.diff(s3)))[0].shape[0]
         #MAV
         mav[i, ch] = np.mean(np.abs(
@@ -164,7 +165,7 @@ for i in range(len(targets)):
 #        diff() =     [ 0,  0,  0, -2,  0,  2,  0,  0,  0, -2,  2, -2,  2,  0,  0, -2]
 #        where() = (array([ 3,  5,  9, 10, 11, 12, 15]),)
 #        where()[0].shape[0] = 7
-#    The number of zero crossing should be 7, but because sign() 
+#    The number of zero crossing should be 7, but because sign()
 #    returns 0 if 0 is passed, 1 for positive, and -1 for negative values,
 #    diff() will count the transition containing zero twice.
 #    An alternative might be:
