@@ -201,42 +201,56 @@ for i in range(1,emg_channels.shape[0]):
     # when the trigger goes up 0 -> 1
     if emg_trigger_corrected[i-1] < 1 and emg_trigger_corrected[i] >= 1:
         contractions_onsets.append(i)
-        contractions_offsets.append(i+100)
+        # uncomment next line if you want a fixed window length of 500 points
+        # contractions_offsets.append(i+500)
+        # and comment the next 2 lines...
     # when the trigger goes down 1 -> 0
-#    if emg_trigger_corrected[i-1] > 1 and emg_trigger_corrected[i] <= 1:
-#        contractions_offsets.append(i)
+    if emg_trigger_corrected[i-1] > 1 and emg_trigger_corrected[i] <= 1:
+        contractions_offsets.append(i)
 
+######################
 #%% Feature Extraction
-#TODO: Perguntar eber como calcular WL e SSC
+######################
+
+# Below are the 6 features to extract
 rms = np.zeros((len(targets), 4), dtype=float) # root mean square (RMS)
 zc = np.zeros((len(targets), 4), dtype=float) # zero crossing (ZC)
 mav = np.zeros((len(targets), 4), dtype=float) # mean absolute value (MAV)
-#wl = np.zeros((len(targets), 4), dtype=float) # waveform length (WL)
 var = np.zeros((len(targets), 4), dtype=float) # variance (VAR)
-#ssc = np.zeros((len(targets), 4), dtype=float) # slope sign changes (SSC)
+wl = np.zeros((len(targets), 4), dtype=float) # waveform length (WL)
+ssc = np.zeros((len(targets), 4), dtype=float) # slope sign changes (SSC)
 
-#%% Extraindo as caracteristicas
+##############
+#%% Extracting
+##############
+
+# For each movement (each contraction)
 for i in range(len(targets)):
     for ch in range(4):
-        #RMS
+        # RMS
         rms[i,ch] = np.sqrt(np.mean(np.square(
            emg_filtered_60hz[contractions_onsets[i]:contractions_offsets[i],ch]
            )))
-        #ZC
+        # ZC
         s3= np.sign(
          emg_filtered_60hz[contractions_onsets[i]:contractions_offsets[i],ch])
         s3[s3==0] = -1     # replace zeros with -1
         zc[i,ch] = (np.where(np.diff(s3)))[0].shape[0]
-        #MAV
+        # MAV
         mav[i, ch] = np.mean(np.abs(
                 emg_retificado[contractions_onsets[i]:contractions_offsets[i],ch]
                 ))
-        #VAR
+        # VAR
         var[i, ch] = np.var(
                 emg_filtered_60hz[contractions_onsets[i]:contractions_offsets[i],ch]
                 )
+        # WL
+        # TODO
 
-#Explicações:
+        # SSC
+        # TODO
+
+# Detailled Description:
 #    RMS:
 #        sqrt(mean(square(vetor)))
 #    ZC:
@@ -250,8 +264,14 @@ for i in range(len(targets)):
 #    diff() will count the transition containing zero twice.
 #    An alternative might be:
 #
-#TODO: terminar a extração de caracteristicas
+
+#########################
 #%% Dataset Pre-processed
+#########################
+
+# Constructing the classifier input (X)
+# X will be a matrix, containing all 6 features
+# is also possible to delete some feature and verify the result
 X = np.append(arr=rms, values=zc, axis=1)
 X = np.append(arr=X, values=mav, axis=1)
 X = np.append(arr=X, values=var, axis=1)
@@ -259,12 +279,17 @@ X = np.append(arr=X, values=var, axis=1)
 #y = targets # saida = targets
 #y = y.reshape(-1,1).astype(float)
 
+# The classifier output (y)
 y = np.array(targets_str)
 
 #y = np.zeros((targets.shape[0],6),dtype=bool)
 
 #for n in range(1,7):
 #    y[:,n-1] = (targets == n).astype(bool)
+
+############################################
+#%% Here we start the Machine Learning Part
+###########################################
 
 # Encoding categorical data
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
