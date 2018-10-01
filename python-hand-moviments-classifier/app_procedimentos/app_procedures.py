@@ -11,19 +11,53 @@ import numpy as np # handling numerical data
 import matplotlib.pyplot as plt # Plotting
 from scipy import signal
 
+###############################
 #%% Adding the path to datasets
-#HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "Flexionar"]
-HAND_MOVIMENTS_NAMES = ["Supination", "Pronation", "Pincer", "Fermer", "Prolonger", "Flex"]
+###############################
 
+# Description of the analysed movements:
+# Movement Number - Movement Name
+# 1 -> Supinar
+# 2 -> Pronar
+# 3 -> Pinçar
+# 4 -> Fechar
+# 5 -> Estender
+# 6 -> Flexionar
+# This should be the output of the classifier. It should classify each moviment
+# in one of this classes.
+HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "Flexionar"]
+
+#########################
 #%% Importing the dataset
-# NOTE: perguntar julia sobre os protocolos dessas coletas,
-# por que 11, 12, 13, 14, 21, 22, 23, 24?
+#########################
+
+# The file name refering to the folder where this script is located
+#   - emg-movements-classifier
+#       - datasets
+#           - coletas
+#               - Eber
+#               - LH
+#               - Miguel... etc
+#       - python-hand_moviments-classifier
+#           - app_procedimentos
+#               - app_procedures.py
 file_name = '../../datasets/coletas/Eber/Eber11-Final.txt'
+
+# Opening a file and reading it to a dataFrame object
+# sep means separator, the files have no headers
+# After reading it, we add the names of each column in the dataset.
+# At end, we select the 4 channels as a numpy vector and we save it in
+# emg_channels.
+# The trigger is saved in emg_trigger.
 dataset = pd.read_table(file_name, sep=';', header=None)
 dataset.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
 emg_channels = dataset.iloc[:, :-2].values
 emg_trigger = dataset.iloc[:, -2].values
 
+# Here we do the same for obtaining a numpy vector with the movements
+# executed in each peek of the trigger.
+# targets contains the moviments as a number from 1 to 6
+# and targets_str as a string(name)
 file_name_targets = '../../datasets/coletas/Eber/Eber11-Resposta.txt'
 targets = pd.read_table(file_name_targets, header=None)
 targets = targets.iloc[:, :].values.ravel()
@@ -31,17 +65,50 @@ targets_str = []
 for target in targets:
     targets_str.append(HAND_MOVIMENTS_NAMES[target-1])
 
-#%% Constantes dos sinais
-# Tempo de atraso (em amostras) no TRIGER para sincronização SINAL/TRIGGER
-delay_trigger = 500
-fs = 2000  # Frequência de amostragem (Hz)fa =
+#####################
+#%% Signal constants
+#####################
 
+# The empirical delay time between the signal saying to execute a movement and
+# the start of some movement by the volunteer.
+# We guess a time of 250ms, this means 500 data points at a sampling frequency
+# of 2 kHz
+# This s a dalay time in the TRIGGER necessary to sync the TRIGGER with the SIGNAL
+delay_trigger = 500 # amount of points to delay
+fs = 2000  # Sampling frequency in Hz
+
+#########################
 #%% Correcting the triger
-# NOTE perguntar julia oq vai ser feito desse atraso
+#########################
+
+# representation of why there are the necessity of syncing the signals
+# Before correction:
+#     emg signal: __________. .||||||||-.._____________
+#                            ''||||||||-''
+# trigger signal:       ________________
+#                 _____|               |_____________
+#
+# After Correction:
+#     emg signal: __________. .||||||||-.._____________
+#                            ''||||||||-''
+# trigger signal:           ________________
+#                 _________|               |_____________
+#
+
+# append concatenates some values in a array.
+# Here we insert a array of zeros at the beggining of the trigger
+# objectiving to deslocate the signal
+# We also exclude the last 'delay_trigger' points of the signal
+# to garant that the new array will have the same size of the emg_trigger
 emg_trigger_corrected = np.append(arr = np.zeros(delay_trigger),
                                   values = emg_trigger[:-delay_trigger])
 
+###############################
 #%% Optional: Plotting the data
+###############################
+
+# Here we use the matplotlib library to plot a small window of the signal
+# And verify if everything is all right
 
 fig = plt.figure()
 axes = [None for i in range(4)]
@@ -60,8 +127,14 @@ axes[1].set_xticklabels([])
 axes[2].set_xticklabels([])
 plt.show()
 
-#%% Filtering
-# NOTE: Perguntar a julia sobre a filtragem, quais filtros tenho que passar?
+#########################################
+#%% Filtering - Pre processing the signal
+#########################################
+
+# NOTE: We can change this filter settings, which filters we want to pass, etc
+# This is in that way for no raison, only beacause it worked when I tested, but
+# I don't know how to explai why did I select this filters etc.
+# Perguntar a julia sobre a filtragem, quais filtros tenho que passar?
 # quais frequencias? quais caracteristicas?
 
 # Parâmetros para a construção dos filtros
