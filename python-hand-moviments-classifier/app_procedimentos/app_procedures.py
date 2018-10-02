@@ -245,10 +245,13 @@ for i in range(len(targets)):
                 emg_filtered_60hz[contractions_onsets[i]:contractions_offsets[i],ch]
                 )
         # WL
-        # TODO
-
+        wl[i, ch] = np.sum(np.abs(np.diff(
+                emg_filtered_60hz[contractions_onsets[i]:contractions_offsets[i],ch]
+                )))
         # SSC
-        # TODO
+        ssc[i, ch] = np.where(np.diff(np.sign(np.diff(
+                emg_filtered_60hz[contractions_onsets[i]:contractions_offsets[i],ch]
+                ))))[0].shape[0]
 
 # Detailled Description:
 #    RMS:
@@ -262,7 +265,20 @@ for i in range(len(targets)):
 #    The number of zero crossing should be 7, but because sign()
 #    returns 0 if 0 is passed, 1 for positive, and -1 for negative values,
 #    diff() will count the transition containing zero twice.
-#    An alternative might be:
+#
+#   SSC:
+#       It uses diff to derivate the signal and obtain the slope
+#       So it verifies how many times the slope has changed from a positive
+#       number to a negative one.
+#       Try uncommenting the next lines and verify:
+#        ttt = np.linspace(0,1,1000)
+#        xxx = np.sin(2*np.pi*10*ttt) +  0.8*np.sin(2*np.pi*15*ttt) + 0.2*np.sin(2*np.pi*1*ttt)
+#
+#        ssc_ = np.diff(np.sign(np.diff(xxx)))
+#        ssc_ = np.append(ssc_, [0,0])
+#        plt.plot(ttt,xxx)
+#        plt.plot(ttt,ssc_)
+#        ssc_ = np.where(ssc_)[0].shape[0]
 #
 
 #########################
