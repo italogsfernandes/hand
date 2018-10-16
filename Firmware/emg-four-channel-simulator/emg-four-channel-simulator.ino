@@ -2,24 +2,29 @@
    Biomedical Engineering
 
    Autors: Ítalo G S Fernandes
-           Julia Nepomuceno Mello
 
    contact: italogsfernandes@gmail.
    URLs: https://github.com/italogfernandes/
 
-  Requisitos: Biblioteca Timer One[https://github.com/PaulStoffregen/TimerOne]
+  Requisites: Library Timer One[https://github.com/PaulStoffregen/TimerOne]
+            [DueTimer](https://github.com/ivanseidel/DueTimer)
 
-  Este codigo faz parte da disciplina de topicos avancados
-  em instrumentacao boomedica e visa realizar a aquisicao
-  de dados via o conversor AD do arduino e o envio destes
-  para a interface serial.
+  This code aims to simulate EMG signals from 4 channels representing 6
+  different movements of the hand
+  and send this to the serial interface as ASCII text or as binary data.
 
-  O seguinte pacote é enviado:
-  Pacote: START | MSB  | LSB  | END
-  Exemplo:  '$' | 0x01 | 0x42 | '\n'
+  When selected the binary data mode this is the format of the packet
+  For 1 channel:
+  Packet:  START | MSB  | LSB  | END
+  Exemple:  '$' | 0x01 | 0x42 | '\n'
+  For n channels:
+  Packet:  START | MSB1  | LSB1  | MSB...  | LSB...  | MSB_n  | LSB_n  | END
+  Exemple:  '$' |  0x01 |  0x42 |  0x01   |  0x33   |  0x02   |  0xB4  | '\n'
 */
-//Ativa e desativa o envio para o plotter serial
-#define PLOTTER_SERIAL
+//Uncomment the next line to activate the sending of data as text
+//This is usefull when you are using the serial plotter tool (Ctrl+shift+L)
+//#define PLOTTER_SERIAL
+
 
 //Libraries
 #include "SignalGenerator.h"
@@ -70,21 +75,21 @@ void showData();
 //Main Function //
 //////////////////
 void setup() {
-  Serial.begin(UART_BAUDRATE);
+    Serial.begin(UART_BAUDRATE);
 
-  pinMode(SUPINAR_WAVE_PIN, INPUT_PULLUP);
-  pinMode(PRONAR_WAVE_PIN, INPUT_PULLUP);
-  pinMode(PINCAR_WAVE_PIN, INPUT_PULLUP);
-  pinMode(FECHAR_WAVE_PIN, INPUT_PULLUP);
-  pinMode(ESTENDER_WAVE_PIN, INPUT_PULLUP);
-  pinMode(FLEXIONAR_WAVE_PIN, INPUT_PULLUP);
+    pinMode(SUPINAR_WAVE_PIN, INPUT_PULLUP);
+    pinMode(PRONAR_WAVE_PIN, INPUT_PULLUP);
+    pinMode(PINCAR_WAVE_PIN, INPUT_PULLUP);
+    pinMode(FECHAR_WAVE_PIN, INPUT_PULLUP);
+    pinMode(ESTENDER_WAVE_PIN, INPUT_PULLUP);
+    pinMode(FLEXIONAR_WAVE_PIN, INPUT_PULLUP);
 
-  my_generator.setOffset(512);
-  my_generator.setAmplitude(512);
-  my_generator.setWaveform(SUPINAR_WAVE);
-
-  SETUP_TIMER();
-  START_TIMER();
+    my_generator.setOffset(512);
+    my_generator.setAmplitude(512);
+    my_generator.setWaveform(SUPINAR_WAVE);
+    my_generator.setFreqDivider(2); //working with 500Hz to allow plotter serial to work
+    SETUP_TIMER();
+    START_TIMER();
 }
 
 void loop() {
@@ -115,31 +120,31 @@ void loop() {
 //Aquire Routine //
 ///////////////////
 void timerDataAcq() {
-  my_generator.generate_value(emg_read_values);
-  for(int i=0; i<QNT_CH; i++){
-    adc_read_values[i] = (uint16_t) emg_read_values[i];
-  }
-  //Sending the value
-#ifndef PLOTTER_SERIAL
-  sendData();
-#else
-  showData();
-#endif
+    my_generator.generate_value(emg_read_values);
+    for(int i=0; i<QNT_CH; i++){
+        adc_read_values[i] = (uint16_t) emg_read_values[i];
+    }
+    //Sending the value
+    #ifndef PLOTTER_SERIAL
+    sendData();
+    #else
+    showData();
+    #endif
 }
 
 void sendData() {
-  Serial.write(PACKET_START);
-  for(int i=0; i<QNT_CH; i++){
-    Serial.write(adc_read_values[i] >> 8);
-    Serial.write(adc_read_values[i]);
-  }
-  Serial.write(PACKET_END);
+    Serial.write(PACKET_START);
+    for(int i=0; i<QNT_CH; i++){
+        Serial.write(adc_read_values[i] >> 8);
+        Serial.write(adc_read_values[i]);
+    }
+    Serial.write(PACKET_END);
 }
 
 void showData() {
-  for(int i=0; i<QNT_CH; i++){
-    Serial.print(adc_read_values[i]+1024*i);
-    Serial.print("\t");
-  }
-  Serial.println();
+    for(int i=0; i<QNT_CH; i++){
+        Serial.print(adc_read_values[i]+1024*i);
+        Serial.print("\t");
+    }
+    Serial.println();
 }

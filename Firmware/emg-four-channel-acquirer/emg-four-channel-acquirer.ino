@@ -8,7 +8,7 @@
 
   Requisites: Library Timer One[https://github.com/PaulStoffregen/TimerOne]
 
-  This code ains to acquire data from the arduino analog to digital converter
+  This code aims to acquire data from the arduino analog to digital converter
   (ADC) and send this to the serial interface as ASCII text or as binary data.
 
   When selected the binary data mode this is the format of the packet
