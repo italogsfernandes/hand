@@ -27,6 +27,7 @@ Pour assurer une comparaison juste nous utiliserons un unique langage de program
 
 
 ## Authors and License
+This repository is under MIT licence, but we also love the beerware license, so:
 ```
 "THE BEER-WARE LICENSE" (Revision 42):
 Gaeton, Italo, Theotim and Samuel wrote this codes.
