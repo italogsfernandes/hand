@@ -1,19 +1,19 @@
 /* UNIVERSIDADE FEDERAL DE UBERLANDIA
    Biomedical Engineering
-   
+
    Autors: Ítalo G S Fernandes
            Julia Nepomuceno Mello
-           
+
    contact: italogsfernandes@gmail.
    URLs: https://github.com/italogfernandes/
 
   Requisitos: Biblioteca Timer One[https://github.com/PaulStoffregen/TimerOne]
-   
+
   Este codigo faz parte da disciplina de topicos avancados
   em instrumentacao boomedica e visa realizar a aquisicao
   de dados via o conversor AD do arduino e o envio destes
   para a interface serial.
-  
+
   O seguinte pacote é enviado:
   Pacote: START | MSB  | LSB  | END
   Exemplo:  '$' | 0x01 | 0x42 | '\n'
@@ -47,6 +47,14 @@
 #define PACKET_END    '\n'
 #define QNT_CH        4
 
+//Arduino Pins
+#define SUPINAR_WAVE_PIN    8
+#define PRONAR_WAVE_PIN     9
+#define PINCAR_WAVE_PIN     10
+#define FECHAR_WAVE_PIN     11
+#define ESTENDER_WAVE_PIN   12
+#define FLEXIONAR_WAVE_PIN  13
+
 ////////////////
 //Global data //
 ////////////////
@@ -63,17 +71,44 @@ void showData();
 //////////////////
 void setup() {
   Serial.begin(UART_BAUDRATE);
-  
+
+  pinMode(SUPINAR_WAVE_PIN, INPUT_PULLUP);
+  pinMode(PRONAR_WAVE_PIN, INPUT_PULLUP);
+  pinMode(PINCAR_WAVE_PIN, INPUT_PULLUP);
+  pinMode(FECHAR_WAVE_PIN, INPUT_PULLUP);
+  pinMode(ESTENDER_WAVE_PIN, INPUT_PULLUP);
+  pinMode(FLEXIONAR_WAVE_PIN, INPUT_PULLUP);
+
   my_generator.setOffset(512);
   my_generator.setAmplitude(512);
   my_generator.setWaveform(SUPINAR_WAVE);
-  
+
   SETUP_TIMER();
   START_TIMER();
 }
 
 void loop() {
-
+    // Movement Selection
+    if(!digitalRead(SUPINAR_WAVE_PIN)){
+        my_generator.setWaveform(SUPINAR_WAVE);
+    }
+    else if(!digitalRead(PRONAR_WAVE_PIN)){
+        my_generator.setWaveform(PRONAR_WAVE);
+    }
+    else if(!digitalRead(PINCAR_WAVE_PIN)){
+        my_generator.setWaveform(PINCAR_WAVE);
+    }
+    else if(!digitalRead(FECHAR_WAVE_PIN)){
+        my_generator.setWaveform(FECHAR_WAVE);
+    }
+    else if(!digitalRead(ESTENDER_WAVE_PIN)){
+        my_generator.setWaveform(ESTENDER_WAVE);
+    }
+    else if(!digitalRead(FLEXIONAR_WAVE_PIN)){
+        my_generator.setWaveform(FLEXIONAR_WAVE);
+    } else{
+        my_generator.setWaveform(REPOUSO_WAVE);
+    }
 }
 
 ///////////////////
