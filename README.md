@@ -1,6 +1,13 @@
 # Main
 Prothèse myoélectrique de la main : comparaison entre SVM et CNN
 
+## Repository Organisation
+* **datasets**: empty folder, plase download our datasets in the google drive folder, if you have access, and place then inside this folder. Sorry for not sharing this here, but our volunteers weren't asked for the permission of sharing this data.
+* **doscs**: not so important... figures, schemas, and references for this and others .md files.
+* **Firmware**: Arduino Sketchs for acquiring and simulating signals.
+* **python-hand-movements-classifier**: Offline classifier for validate our strategy and tests some ML variations.
+* **python-real-time-application**: GUI for managing real time acquisition, classification and control of the prothesis.
+
 ## Objective
 But: Créer un modèle de prothèse myoélectrique de la main fonctionnelle pour comparer deux paradigme de traitement de signal: Réseaux de neurones artificielles (CNN) et machine à vecteur de support (SVM).
 
@@ -10,6 +17,7 @@ Pour cela nous imprimerons et construirons le modèle d’avant bras open-source
 Pour assurer une comparaison juste nous utiliserons un unique langage de programmation, notre choix s’est arrêté sur le Python. Nous allons comparer les deux modèles sur la rapidité et l’efficacité lors de l’apprentissage et sur les performances en temps réel.
 
 **Processus prévisionnelle de fonctionnement du projet**
+
 ![](docs/image3.png)
 
 ## Sources
