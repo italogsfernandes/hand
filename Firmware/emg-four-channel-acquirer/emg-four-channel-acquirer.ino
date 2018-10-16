@@ -1,28 +1,29 @@
 /* UNIVERSIDADE FEDERAL DE UBERLANDIA
    Biomedical Engineering
-   
+
    Autors: Ítalo G S Fernandes
-           Julia Nepomuceno Mello
-           
+
    contact: italogsfernandes@gmail.
    URLs: https://github.com/italogfernandes/
 
-  Requisitos: Biblioteca Timer One[https://github.com/PaulStoffregen/TimerOne]
-   
-  Este codigo faz parte da disciplina de topicos avancados
-  em instrumentacao boomedica e visa realizar a aquisicao
-  de dados via o conversor AD do arduino e o envio destes
-  para a interface serial.
-  
-  O seguinte pacote é enviado:
-  Pacote: START | MSB  | LSB  | END
-  Exemplo:  '$' | 0x01 | 0x42 | '\n'
+  Requisites: Library Timer One[https://github.com/PaulStoffregen/TimerOne]
+
+  This code ains to acquire data from the arduino analog to digital converter
+  (ADC) and send this to the serial interface as ASCII text or as binary data.
+
+  When selected the binary data mode this is the format of the packet
+  For 1 channel:
+  Packet:  START | MSB  | LSB  | END
+  Exemple:  '$' | 0x01 | 0x42 | '\n'
+  For n channels:
+  Packet:  START | MSB1  | LSB1  | MSB...  | LSB...  | MSB_n  | LSB_n  | END
+  Exemple:  '$' |  0x01 |  0x42 |  0x01   |  0x33   |  0x02   |  0xB4  | '\n'
 */
-//Ativa e desativa o envio para o plotter serial
+//Uncomment the next line to activate the sending of data as text
+//This is usefull when you are using the serial plotter tool (Ctrl+shift+L)
 //#define PLOTTER_SERIAL
 
 //Libraries
-
 ///////////
 //Timers //
 ///////////
@@ -96,4 +97,3 @@ void showData() {
   }
   Serial.println();
 }
-
