@@ -12,6 +12,7 @@
 # ------------------------------------------------------------------------------
 from EMGPlotHandler import EMGPlotHandler
 from libraries.QtArduinoPlotter import QtArduinoPlotter
+from libraries.ArduinoHandler import ArduinoHandler
 # ------------------------------------------------------------------------------
 import numpy as np
 import scipy.fftpack as fftpack
@@ -98,6 +99,7 @@ class EMGProcessing:
 class ArduinoEMGPlotter(QtArduinoPlotter):
     def __init__(self, parent, app=None, label=None):
         QtArduinoPlotter.__init__(self, parent, app, label)
+        self.arduinoHandler = ArduinoHandler(qnt_ch=4)
         self.process = EMGProcessing()
         self.plotHandler.emg_bruto.set_visible(True)
         self.plotHandler.hilbert.set_visible(False)
@@ -106,6 +108,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.plotHandler.threshold.set_visible(False)
         self.plotHandler.set_detection_visible(False)
         self.emg_value = 0
+        self.emg_values = [0] * 4
 
         # Processamento:
         self.process_simple_way = False
@@ -137,6 +140,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
 
     def update_proc_type(self, new_proc):
         tipo = new_proc
+        tipo = 'Desativado'
         if tipo == 'Desativado':
             self.process_in_thread = False
             self.process_simple_way = False
@@ -159,50 +163,18 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
             self.process_in_thread = True
 
     def consumer_function(self):
-        if self.process_in_plotter:
-            if self.arduinoHandler.data_waiting:
-                #print("help! i need")
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 1024.0 - 2.5
-                self.plotHandler.emg_bruto.buffer.put(self.emg_value)
-        elif self.process_simple_way:
-            if self.arduinoHandler.data_waiting:
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 1024.0 - 2.5
-                #self.offset_values = np.roll(self.offset_values, -1)
-                #self.offset_values[:-1] = self.offset_values[1:]
-                #self.offset_values[-1] = self.emg_value
-                self.offset_values.pop(0)
-                self.offset_values.append(self.emg_value)
-                hbt = self.emg_value - sum(self.offset_values)/len(self.offset_values)
-                hbt_ret = abs(hbt)
-                #self.mva_values = np.roll(self.mva_values,-1)
-                #self.mva_values[:-1] = self.mva_values[1:]
-                #self.mva_values[-1] = hbt_ret
-                self.mva_values.pop(0)
-                self.mva_values.append(abs(hbt))
-                env = sum(self.mva_values)/len(self.mva_values)
-                self.plotHandler.emg_bruto.buffer.put(self.emg_value)
-                self.plotHandler.hilbert.buffer.put(hbt)
-                self.plotHandler.hilbert_retificado.buffer.put(hbt_ret)
-                self.plotHandler.envoltoria.buffer.put(env*3.83)
-        elif self.process_in_thread:
-            if self.arduinoHandler.data_waiting:
-                # print "hello i'm here"
-                points_to_process = self.arduinoHandler.buffer_acquisition.qsize()
-                for n in range(points_to_process):
-                    self.emg_value = self.arduinoHandler.buffer_acquisition.get()*5.0/1024.0 - 2.5
-                    self.process.buffer.append(self.emg_value)
-                self.process.update_values()
-                self.process.do_process()
-                for n in range(points_to_process):
-                    index_out = self.process.window_size - points_to_process + n - 128
-                    self.plotHandler.emg_bruto.buffer.put(self.process.emg_bruto[index_out])
-                    self.plotHandler.hilbert.buffer.put(self.process.hilbert[index_out])
-                    self.plotHandler.hilbert_retificado.buffer.put(self.process.hilbert_retificado[index_out])
-                    self.plotHandler.envoltoria.buffer.put(self.process.envoltoria[index_out])
-        else:
-            if self.arduinoHandler.data_waiting:
-                self.emg_value = self.arduinoHandler.buffer_acquisition.get() * 5.0 / 1024.0 - 2.5
-                self.plotHandler.emg_bruto.buffer.put(self.emg_value)
+        if self.arduinoHandler.data_waiting:
+            self.emg_values = self.arduinoHandler.buffer_acquisition.get()
+            for n in range(4):
+                self.emg_values[n] = self.emg_values[n] * 5.0/1024.0 - 2.5 + n/3.0
+            self.plotHandler.emg_bruto.buffer.put(self.emg_values[0])
+            self.plotHandler.hilbert.buffer.put(self.emg_values[1])
+            self.plotHandler.hilbert_retificado.buffer.put(self.emg_values[2])
+            self.plotHandler.envoltoria.buffer.put(self.emg_values[3])
+            #self.plotHandler.lines[0].buffer.put(self.emg_values[0])
+            #self.plotHandler.lines[1].buffer.put(self.emg_values[1])
+            #self.plotHandler.lines[2].buffer.put(self.emg_values[2])
+            #self.plotHandler.lines[3].buffer.put(self.emg_values[3])
 
 
 def test():

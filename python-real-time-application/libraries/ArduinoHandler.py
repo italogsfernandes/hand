@@ -209,7 +209,7 @@ class ArduinoHandler:
 
 
 def test():
-    my_arduino_handler = ArduinoHandler(port_name='/dev/ttyACM0')
+    my_arduino_handler = ArduinoHandler(port_name='/dev/ttyACM0',qnt_ch=4)
 
     def printer():
         if my_arduino_handler.data_waiting:
@@ -233,7 +233,7 @@ def test():
     def show_status():
         print(my_arduino_handler)
 
-    status_timer = InfiniteTimer(0.5, show_status)
+    status_timer = InfiniteTimer(1, show_status)
     while True:
         print('-------------------------------')
         print(my_arduino_handler)
