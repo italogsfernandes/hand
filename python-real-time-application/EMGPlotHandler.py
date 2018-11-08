@@ -6,7 +6,7 @@
 # ------------------------------------------------------------------------------
 # Author: Italo Gustavo Sampaio Fernandes
 # Contact: italogsfernandes@gmail.com
-# Git: www.github.com/italogfernandes
+# Git: www.github.com/italogsfernandes
 # ------------------------------------------------------------------------------
 # Description:
 # ------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
    Autors: Ítalo G S Fernandes
 
    contact: italogsfernandes@gmail.
-   URLs: https://github.com/italogfernandes/
+   URLs: https://github.com/italogsfernandes/
 
   Requisites: Library Timer One[https://github.com/PaulStoffregen/TimerOne]
             [DueTimer](https://github.com/ivanseidel/DueTimer)

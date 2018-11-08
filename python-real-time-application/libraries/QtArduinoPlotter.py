@@ -6,7 +6,7 @@
 # ------------------------------------------------------------------------------
 # Author: Italo Gustavo Sampaio Fernandes
 # Contact: italogsfernandes@gmail.com
-# Git: www.github.com/italogfernandes
+# Git: www.github.com/italogsfernandes
 # ------------------------------------------------------------------------------
 # Description:
 # ------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class QtArduinoPlotter:
         self.consumerThread = ThreadHandler(self.consumer_function)
         self.timerStatus = InfiniteTimer(0.05, self.print_buffers_status)
         self.started = False
-    
+
     def _init_plotHandler(self, parent, app):
         """
         Only initializes the plotHandler object. It is set as a method to allow override.

@@ -8,7 +8,7 @@
 # Contact: nakagawa.andrei@gmail.com
 # Class: ThreadHander
 # Modifications: Italo G S Fernandes
-#                 (italogsfernandes@gmail.com, github.com/italogfernandes)
+#                 (italogsfernandes@gmail.com, github.com/italogsfernandes)
 # ------------------------------------------------------------------------------
 # Description:
 # ------------------------------------------------------------------------------
