@@ -29,241 +29,68 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Contraction Detector</string>
+   <string>Project Main</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayoutOptions">
-      <item>
-       <widget class="QLabel" name="lbl_options">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Opções:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayoutBtns">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_EMG">
+       <attribute name="title">
+        <string>EMG</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <spacer name="horizontalSpacerBtns1">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Minimum</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayoutBtns">
+         <layout class="QVBoxLayout" name="verticalLayoutGraphStatus">
           <item>
-           <widget class="QPushButton" name="btn_start">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>40</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Start</string>
-            </property>
+           <layout class="QVBoxLayout" name="verticalLayoutGraph">
+            <item>
+             <widget class="QLabel" name="label_replace">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Here will be the chart</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="lbl_status">
             <property name="text">
-             <string>S</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_calib">
-            <property name="maximumSize">
-             <size>
-              <width>40</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Calibrar</string>
-            </property>
-            <property name="text">
-             <string>C</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="horizontalSpacerBtns2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Minimum</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayoutThreshould">
-        <item>
-         <widget class="QLabel" name="lbl_threshould">
-          <property name="text">
-           <string>Limiar:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayoutThreshould">
-          <item>
-           <spacer name="horizontalSpacerTh1">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Minimum</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QSlider" name="sl_threshould">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacerTh2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Minimum</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayoutCheckBoxes">
-          <item>
-           <widget class="QCheckBox" name="cb_emg">
-            <property name="text">
-             <string>EMG</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cb_hbt">
-            <property name="text">
-             <string>HBT</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cb_ret">
-            <property name="text">
-             <string>RET</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cb_env">
-            <property name="text">
-             <string>ENV</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cb_lim">
-            <property name="text">
-             <string>LIM</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cb_det">
-            <property name="text">
-             <string>DET</string>
+             <string>Status:</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
        </layout>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayoutGraphStatus">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayoutGraph">
-        <item>
-         <widget class="QLabel" name="label_replace">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Here will be the chart</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="lbl_status">
-        <property name="text">
-         <string>Status:</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+       <zorder>label_replace</zorder>
+       <zorder></zorder>
+      </widget>
+      <widget class="QWidget" name="tab_features">
+       <attribute name="title">
+        <string>Features</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_classification">
+       <attribute name="title">
+        <string>Classification</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_settings">
+       <attribute name="title">
+        <string>Settings</string>
+       </attribute>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -278,25 +105,154 @@
    </property>
    <widget class="QMenu" name="menuArquivo">
     <property name="title">
-     <string>Arquivo</string>
+     <string>File</string>
     </property>
+    <addaction name="actionStart_Recording"/>
+    <addaction name="actionStop_Recording"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="menuConfiguracoes">
+   <widget class="QMenu" name="menuFunctions">
     <property name="title">
-     <string>Configurações</string>
+     <string>Functions</string>
     </property>
-    <addaction name="actionProcessamento"/>
+    <addaction name="actionStartAcquisition"/>
    </widget>
    <addaction name="menuArquivo"/>
    <addaction name="menuHelp"/>
-   <addaction name="menuConfiguracoes"/>
+   <addaction name="menuFunctions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayoutOptions">
+       <item>
+        <widget class="QLabel" name="lbl_options">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Options:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayoutThreshould">
+         <item>
+          <widget class="QLabel" name="lbl_status_opt">
+           <property name="text">
+            <string>Status:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_acquiring_status">
+           <property name="text">
+            <string>Acquiring: Off</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_plotting_status">
+           <property name="text">
+            <string>Plotting: Off</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_processing_status">
+           <property name="text">
+            <string>Processing: Off</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_classification_status">
+           <property name="text">
+            <string>Classification: Off</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_status">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayoutCheckBoxes">
+           <item>
+            <widget class="QLabel" name="label_channels">
+             <property name="text">
+              <string>Channels:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cb_ch1">
+             <property name="text">
+              <string>CH1</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cb_ch3">
+             <property name="text">
+              <string>CH2</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cb_ch4">
+             <property name="text">
+              <string>CH3</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cb_ch2">
+             <property name="text">
+              <string>CH4</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="actionSimples">
    <property name="text">
     <string>Processamento</string>
@@ -317,12 +273,27 @@
     <string>Desativado</string>
    </property>
   </action>
-  <action name="actionProcessamento">
+  <action name="actionStartAcquisition">
    <property name="checkable">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Processamento</string>
+    <string>Start Acquisition</string>
+   </property>
+  </action>
+  <action name="actionStart_Recording">
+   <property name="text">
+    <string>Start Recording</string>
+   </property>
+  </action>
+  <action name="actionStop_Recording">
+   <property name="text">
+    <string>Stop Recording</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>
