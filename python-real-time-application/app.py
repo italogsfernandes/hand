@@ -50,9 +50,9 @@ class ContractionDetector(QMainWindow, base.Ui_MainWindow):
 
         # Setting up inicial conditions:
         self.cb_emg.toggle() # enable the plot of the emg signal
+        # sets the threshould for contraction detection
         self.sl_threshould.setValue(0.25)
         self.sl_threshould_value_changed(10)
-        self.proc_changed("Desativado")
 
     def setup_signals_connections(self):
         #self.actionProcessamento.triggered.connect(self.processamento_clicked)
