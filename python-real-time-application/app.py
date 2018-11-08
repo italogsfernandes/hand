@@ -31,49 +31,25 @@ else:
     print("Versao do python nao suportada")
 # ------------------------------------------------------------------------------
 
-
-class SetupApp(QMainWindow, config_window.Ui_windowConfig):
-    def __init__(self, parent=None):
-        super(SetupApp, self).__init__(parent)
-        self.setupUi(self)
-        # Define a new signal called 'trigger' that has no arguments.
-        #self.trigger = QtCore.pyqtSignal()
-        self.setup_signals_connections()
-        self.tipos_de_processamento = ['Desativado', 'Simples', 'Plotter', 'Thread']
-        self.populate_cb()
-
-    def setup_signals_connections(self):
-        self.comboBox.currentIndexChanged.connect(self.setup_changed)
-
-    def populate_cb(self):
-        self.comboBox.clear()
-        for tipo in self.tipos_de_processamento:
-            self.comboBox.addItem(tipo)
-        self.comboBox.setCurrentIndex(0)
-
-    def setup_changed(self):
-        proc = self.comboBox.itemText(self.comboBox.currentIndex())
-        # print("Setup Changed to:")
-        # print(proc)
-        #self.trigger.emit(SIGNAL("proc_changed(QString)"), proc)
-
-    def closeEvent(self, q_close_event):
-        super(self.__class__, self).closeEvent(q_close_event)
-
-
 class ContractionDetector(QMainWindow, base.Ui_MainWindow):
     def __init__(self, parent=None):
         super(self.__class__, self).__init__(parent)
+        # Configuring UI, seting up chart, etc:
         self.setupUi(self)
+        # connections between buttons and methods:
         self.setup_signals_connections()
 
+        # Object to acquire EMG signals and plot it (using the serial port).
         self.emg_app = ArduinoEMGPlotter(parent=self.centralwidget,label=self.lbl_status)
+        # Adding object to a specific place in the layout
         self.verticalLayoutGraph.addWidget(self.emg_app.plotHandler.plotWidget)
-
+        # for design reasons I put a label widged in the place, now I need to
+        # remove it
         self.verticalLayoutGraph.removeWidget(self.label_replace)
         self.label_replace.setParent(None)
 
-        self.cb_emg.toggle()
+        # Setting up inicial conditions:
+        self.cb_emg.toggle() # enable the plot of the emg signal
         self.sl_threshould.setValue(0.25)
         self.sl_threshould_value_changed(10)
         self.proc_changed("Desativado")
