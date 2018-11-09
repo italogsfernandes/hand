@@ -46,21 +46,32 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.label_replace.setParent(None)
 
         # Setting up inicial conditions:
-        # None
+        self.cb_ch1.toggle() # enabling visibility of channel
+        self.cb_ch2.toggle() # enabling visibility of channel
+        self.cb_ch3.toggle() # enabling visibility of channel
+        self.cb_ch4.toggle() # enabling visibility of channel
 
     def setup_signals_connections(self):
         """ Connects the events of objects in the view (buttons, combobox, etc)
         to respective methods.
         """
-        self.cb_ch1.toggled.connect(lambda x: self.emg_app.plotHandler.emg_bruto.set_visible(x))
-        self.cb_ch2.toggled.connect(lambda x: self.emg_app.plotHandler.hilbert.set_visible(x))
-        self.cb_ch3.toggled.connect(lambda x: self.emg_app.plotHandler.hilbert_retificado.set_visible(x))
-        self.cb_ch4.toggled.connect(lambda x: self.emg_app.plotHandler.envoltoria.set_visible(x))
+        self.actionStartAcquisition.triggered.connect(self.start_stop_acquisition)
+        self.cb_ch1.toggled.connect(lambda x: self.emg_app.plotHandler.lines[0].set_visible(x))
+        self.cb_ch2.toggled.connect(lambda x: self.emg_app.plotHandler.lines[1].set_visible(x))
+        self.cb_ch3.toggled.connect(lambda x: self.emg_app.plotHandler.lines[2].set_visible(x))
+        self.cb_ch4.toggled.connect(lambda x: self.emg_app.plotHandler.lines[3].set_visible(x))
 
     def closeEvent(self, q_close_event):
         self.emg_app.stop()
         super(self.__class__, self).closeEvent(q_close_event)
 
+    def start_stop_acquisition(self):
+        if not self.emg_app.started:
+            self.emg_app.start()
+            self.actionStartAcquisition.setText("Stop Acquisition")
+        else:
+            self.emg_app.stop()
+            self.actionStartAcquisition.setText("Start Acquisition")
 # ------------------------------------------------------------------------------
 def main():
     """Main function

@@ -101,23 +101,12 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         QtArduinoPlotter.__init__(self, parent, app, label)
         self.arduinoHandler = ArduinoHandler(qnt_ch=4)
         self.process = EMGProcessing()
-        self.plotHandler.emg_bruto.set_visible(True)
-        self.plotHandler.hilbert.set_visible(False)
-        self.plotHandler.hilbert_retificado.set_visible(False)
-        self.plotHandler.envoltoria.set_visible(False)
-        self.plotHandler.threshold.set_visible(False)
-        self.plotHandler.set_detection_visible(False)
+        self.plotHandler.lines[0].set_visible(True)
+        self.plotHandler.lines[1].set_visible(False)
+        self.plotHandler.lines[2].set_visible(False)
+        self.plotHandler.lines[3].set_visible(False)
         self.emg_value = 0
         self.emg_values = [0] * 4
-
-        # Processamento:
-        self.process_simple_way = False
-        self.offset_values = [0] * 1000
-        self.mva_values = [0] * 128
-
-        self.process_in_plotter = False
-
-        self.process_in_thread = False
 
     def get_buffers_status(self, separator):
         """
@@ -127,54 +116,24 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         :return: A string containing the status of all the buffers involved in the acquisition and plotting.
         """
         return self.arduinoHandler.get_buffers_status(separator) + separator + \
-               self.plotHandler.emg_bruto.get_buffers_status()
+               self.plotHandler.lines[0].get_buffers_status()
 
     def _init_plotHandler(self, parent, app):
         """
         Only initializes the plotHandler object. It is set as a method to allow override.
         """
-        self.plotHandler = EMGPlotHandler(qnt_points=4096, parent=parent, y_range=(-2.5, 2.5),
-                                          app=app, proc=None)
-        self.plotHandler.process_in_plotter = False
-        self.plotHandler.proc = 'hbt+btr'
-
-    def update_proc_type(self, new_proc):
-        tipo = new_proc
-        tipo = 'Desativado'
-        if tipo == 'Desativado':
-            self.process_in_thread = False
-            self.process_simple_way = False
-            self.process_in_plotter = False
-            self.plotHandler.process_in_plotter = False
-        elif tipo == 'Simples':
-            self.process_in_thread = False
-            self.process_in_plotter = False
-            self.plotHandler.process_in_plotter = False
-            self.process_simple_way = True
-        elif tipo == 'Plotter':
-            self.process_in_thread = False
-            self.process_simple_way = False
-            self.process_in_plotter = True
-            self.plotHandler.process_in_plotter = True
-        elif tipo == 'Thread':
-            self.process_simple_way = False
-            self.process_in_plotter = False
-            self.plotHandler.process_in_plotter = False
-            self.process_in_thread = True
+        self.plotHandler = EMGPlotHandler(qnt_points=4096, parent=parent, y_range=(-0.05, 1.05),
+                                          app=app)
 
     def consumer_function(self):
         if self.arduinoHandler.data_waiting:
             self.emg_values = self.arduinoHandler.buffer_acquisition.get()
             for n in range(4):
                 self.emg_values[n] = self.emg_values[n] * 5.0/1024.0 - 2.5 + n/3.0
-            self.plotHandler.emg_bruto.buffer.put(self.emg_values[0])
-            self.plotHandler.hilbert.buffer.put(self.emg_values[1])
-            self.plotHandler.hilbert_retificado.buffer.put(self.emg_values[2])
-            self.plotHandler.envoltoria.buffer.put(self.emg_values[3])
-            #self.plotHandler.lines[0].buffer.put(self.emg_values[0])
-            #self.plotHandler.lines[1].buffer.put(self.emg_values[1])
-            #self.plotHandler.lines[2].buffer.put(self.emg_values[2])
-            #self.plotHandler.lines[3].buffer.put(self.emg_values[3])
+            self.plotHandler.lines[0].buffer.put(self.emg_values[0])
+            self.plotHandler.lines[1].buffer.put(self.emg_values[1])
+            self.plotHandler.lines[2].buffer.put(self.emg_values[2])
+            self.plotHandler.lines[3].buffer.put(self.emg_values[3])
 
 
 def test():
