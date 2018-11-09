@@ -35,15 +35,9 @@ class EMGProcessing:
         self.filter_params['a'] = a
 
         self.buffer = deque(maxlen=self.window_size)
-        self.emg_bruto = [0.0] * self.window_size
-        self.moving_avg = [0.0] * self.window_size
         self.hilbert = np.zeros(self.window_size, dtype='float')
         self.hilbert_retificado = np.zeros(self.window_size, dtype='float')
-        self.envoltoria = np.zeros(self.window_size, dtype='float')
-        self.threshold = 0.25
-        self.detection_sites = np.zeros(self.window_size, dtype='bool')
         self.window = 100
-        self.weights = np.hamming(self.window) / (self.window / 2)
 
     def update_values(self):
         """
@@ -105,8 +99,15 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.plotHandler.lines[1].set_visible(False)
         self.plotHandler.lines[2].set_visible(False)
         self.plotHandler.lines[3].set_visible(False)
-        self.emg_value = 0
         self.emg_values = [0] * 4
+        #################################################
+        #NOTE: Put it in another place, only for testing:
+        #################################################
+        self.window_size = 100
+        self.ch1_window = np.zeros(self.window_size, dtype='float')
+        self.ch2_window = np.zeros(self.window_size, dtype='float')
+        self.ch3_window = np.zeros(self.window_size, dtype='float')
+        self.ch4_window = np.zeros(self.window_size, dtype='float')
 
     def get_buffers_status(self, separator):
         """
@@ -126,10 +127,37 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                                           app=app)
 
     def consumer_function(self):
+        """ If there are some data in the queue, add this to the plot.
+        """
         if self.arduinoHandler.data_waiting:
             self.emg_values = self.arduinoHandler.buffer_acquisition.get()
+
+            self.ch1_window[:-1] = self.ch1_window[1:]
+            self.ch1_window[-1] = self.emg_values[0]
+
+            self.ch2_window[:-1] = self.ch2_window[1:]
+            self.ch2_window[-1] = self.emg_values[1]
+
+            self.ch3_window[:-1] = self.ch3_window[1:]
+            self.ch3_window[-1] = self.emg_values[2]
+
+            self.ch4_window[:-1] = self.ch4_window[1:]
+            self.ch4_window[-1] = self.emg_values[3]
+
+            #####
+
+            self.emg_values[0] -= np.mean(self.ch1_window)
+            self.emg_values[1] -= np.mean(self.ch2_window)
+            self.emg_values[2] -= np.mean(self.ch3_window)
+            self.emg_values[3] -= np.mean(self.ch4_window)
+
+            ####
+
             for n in range(4):
-                self.emg_values[n] = self.emg_values[n] * 5.0/1024.0 - 2.5 + n/3.0
+                self.emg_values[n] = self.emg_values[n] * 5.0/1024.0 + n/3.0
+
+            ####
+
             self.plotHandler.lines[0].buffer.put(self.emg_values[0])
             self.plotHandler.lines[1].buffer.put(self.emg_values[1])
             self.plotHandler.lines[2].buffer.put(self.emg_values[2])
