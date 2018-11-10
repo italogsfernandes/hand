@@ -116,10 +116,15 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.features_window_size = 200
         self.features_window_index = 0
         self.features_window_overlap = 20 # 10% of 200
-        self.ch1_festures_window = np.zeros(self.festures_window_size, dtype='float')
-        self.ch2_festures_window = np.zeros(self.festures_window_size, dtype='float')
-        self.ch3_festures_window = np.zeros(self.festures_window_size, dtype='float')
-        self.ch4_festures_window = np.zeros(self.festures_window_size, dtype='float')
+        self.ch1_features_window = np.zeros(self.features_window_size, dtype='float')
+        self.ch2_features_window = np.zeros(self.features_window_size, dtype='float')
+        self.ch3_features_window = np.zeros(self.features_window_size, dtype='float')
+        self.ch4_features_window = np.zeros(self.features_window_size, dtype='float')
+
+        self.ch1_features = {}
+        self.ch2_features = {}
+        self.ch3_features = {}
+        self.ch4_features = {}
 
         ######################################################
         #NOTE: Put it in another place, only for testing [END]
