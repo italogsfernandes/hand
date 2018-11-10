@@ -100,16 +100,30 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.plotHandler.lines[2].set_visible(False)
         self.plotHandler.lines[3].set_visible(False)
         self.emg_values = [0] * 4
+
         #################################################
         #NOTE: Put it in another place, only for testing:
         #################################################
-        self.window_size = 500
-        self.ch1_window = np.zeros(self.window_size, dtype='float')
-        self.ch2_window = np.zeros(self.window_size, dtype='float')
-        self.ch3_window = np.zeros(self.window_size, dtype='float')
-        self.ch4_window = np.zeros(self.window_size, dtype='float')
+        self.mva_window_size = 500
+        self.ch1_mva_window = np.zeros(self.mva_window_size, dtype='float')
+        self.ch2_mva_window = np.zeros(self.mva_window_size, dtype='float')
+        self.ch3_mva_window = np.zeros(self.mva_window_size, dtype='float')
+        self.ch4_mva_window = np.zeros(self.mva_window_size, dtype='float')
+
         self.noise_vector = np.random.normal(-1,1,100)
         self.noise_index = 0
+
+        self.features_window_size = 200
+        self.features_window_index = 0
+        self.features_window_overlap = 20 # 10% of 200
+        self.ch1_festures_window = np.zeros(self.festures_window_size, dtype='float')
+        self.ch2_festures_window = np.zeros(self.festures_window_size, dtype='float')
+        self.ch3_festures_window = np.zeros(self.festures_window_size, dtype='float')
+        self.ch4_festures_window = np.zeros(self.festures_window_size, dtype='float')
+
+        ######################################################
+        #NOTE: Put it in another place, only for testing [END]
+        ######################################################
 
     def get_buffers_status(self, separator):
         """
@@ -129,7 +143,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                                           app=app)
 
     #NOTE: I will put the process found inside the counsumer function inside this fuctions:
-    # def add_to_window(self, input_number, actual_window):
+    # def add_to_mva_window(self, input_number, actual_mva_window):
     # def apply_moving_average_high_pass_filter(self, input_array, window_size):
     # def apply_ajusts_for_simulation(self, raw_emg_values)
 
@@ -147,27 +161,52 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
             ####################################################
 
             ####################################################
-            # Creating windows
-            self.ch1_window[:-1] = self.ch1_window[1:]
-            self.ch1_window[-1] = self.emg_values[0]
+            # Creating windows for pre processing
+            self.ch1_mva_window[:-1] = self.ch1_mva_window[1:]
+            self.ch1_mva_window[-1] = self.emg_values[0]
 
-            self.ch2_window[:-1] = self.ch2_window[1:]
-            self.ch2_window[-1] = self.emg_values[1]
+            self.ch2_mva_window[:-1] = self.ch2_mva_window[1:]
+            self.ch2_mva_window[-1] = self.emg_values[1]
 
-            self.ch3_window[:-1] = self.ch3_window[1:]
-            self.ch3_window[-1] = self.emg_values[2]
+            self.ch3_mva_window[:-1] = self.ch3_mva_window[1:]
+            self.ch3_mva_window[-1] = self.emg_values[2]
 
-            self.ch4_window[:-1] = self.ch4_window[1:]
-            self.ch4_window[-1] = self.emg_values[3]
+            self.ch4_mva_window[:-1] = self.ch4_mva_window[1:]
+            self.ch4_mva_window[-1] = self.emg_values[3]
             ####################################################
 
             ####################################################
             # Applying high-pass mva filter to remove offset
-            self.emg_values[0] -= np.mean(self.ch1_window)
-            self.emg_values[1] -= np.mean(self.ch2_window)
-            self.emg_values[2] -= np.mean(self.ch3_window)
-            self.emg_values[3] -= np.mean(self.ch4_window)
+            self.emg_values[0] -= np.mean(self.ch1_mva_window)
+            self.emg_values[1] -= np.mean(self.ch2_mva_window)
+            self.emg_values[2] -= np.mean(self.ch3_mva_window)
+            self.emg_values[3] -= np.mean(self.ch4_mva_window)
             ####################################################
+
+            ####################################################
+            # Creating windows for extraction of features
+            #BUG: I don't know if this will work, but I hope so. I'm still have to test it
+            # Adding values to window
+            self.ch1_features_window[self.features_window_index] = self.emg_values[0]
+            self.ch2_features_window[self.features_window_index] = self.emg_values[1]
+            self.ch3_features_window[self.features_window_index] = self.emg_values[2]
+            self.ch4_features_window[self.features_window_index] = self.emg_values[3]
+
+            # incrementing index
+            self.features_window_index = self.features_window_index + 1
+            if self.features_window_index >= self.features_window_size:
+                self.features_window_index = self.features_window_overlap
+                self.ch1_features_window[:self.features_window_overlap] = self.ch1_features_window[-self.features_window_overlap:]
+                self.ch2_features_window[:self.features_window_overlap] = self.ch2_features_window[-self.features_window_overlap:]
+                self.ch3_features_window[:self.features_window_overlap] = self.ch3_features_window[-self.features_window_overlap:]
+                self.ch4_features_window[:self.features_window_overlap] = self.ch4_features_window[-self.features_window_overlap:]
+            ####################################################
+
+            ####################################################
+            # Extracting features
+
+            ####################################################
+
 
             ####################################################
             # Applying some adjusts to allow a good plot
