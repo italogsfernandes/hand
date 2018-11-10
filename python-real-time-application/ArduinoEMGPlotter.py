@@ -103,11 +103,13 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         #################################################
         #NOTE: Put it in another place, only for testing:
         #################################################
-        self.window_size = 100
+        self.window_size = 500
         self.ch1_window = np.zeros(self.window_size, dtype='float')
         self.ch2_window = np.zeros(self.window_size, dtype='float')
         self.ch3_window = np.zeros(self.window_size, dtype='float')
         self.ch4_window = np.zeros(self.window_size, dtype='float')
+        self.noise_vector = np.random.normal(-1,1,100)
+        self.noise_index = 0
 
     def get_buffers_status(self, separator):
         """
@@ -123,15 +125,29 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         """
         Only initializes the plotHandler object. It is set as a method to allow override.
         """
-        self.plotHandler = EMGPlotHandler(qnt_points=4096, parent=parent, y_range=(-0.05, 1.05),
+        self.plotHandler = EMGPlotHandler(qnt_points=4096, parent=parent, y_range=(-0.3, 3.3),
                                           app=app)
+
+    #NOTE: I will put the process found inside the counsumer function inside this fuctions:
+    # def add_to_window(self, input_number, actual_window):
+    # def apply_moving_average_high_pass_filter(self, input_array, window_size):
+    # def apply_ajusts_for_simulation(self, raw_emg_values)
 
     def consumer_function(self):
         """ If there are some data in the queue, add this to the plot.
         """
         if self.arduinoHandler.data_waiting:
-            self.emg_values = self.arduinoHandler.buffer_acquisition.get()
+            self.emg_values = np.array(self.arduinoHandler.buffer_acquisition.get(), dtype=float)
+            self.emg_values = self.emg_values * 5.0/1024.0 - 2.5
 
+            ####################################################
+            ## Only for simulation: Ajusting some values
+            self.noise_index = self.noise_index + 1 if self.noise_index < 99 else 0
+            self.emg_values[self.emg_values == 0] += (-0.045 + self.noise_vector[self.noise_index] * 0.0075)
+            ####################################################
+
+            ####################################################
+            # Creating windows
             self.ch1_window[:-1] = self.ch1_window[1:]
             self.ch1_window[-1] = self.emg_values[0]
 
@@ -143,25 +159,29 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
 
             self.ch4_window[:-1] = self.ch4_window[1:]
             self.ch4_window[-1] = self.emg_values[3]
+            ####################################################
 
-            #####
-
+            ####################################################
+            # Applying high-pass mva filter to remove offset
             self.emg_values[0] -= np.mean(self.ch1_window)
             self.emg_values[1] -= np.mean(self.ch2_window)
             self.emg_values[2] -= np.mean(self.ch3_window)
             self.emg_values[3] -= np.mean(self.ch4_window)
+            ####################################################
 
-            ####
-
+            ####################################################
+            # Applying some adjusts to allow a good plot
             for n in range(4):
-                self.emg_values[n] = self.emg_values[n] * 5.0/1024.0 + n/3.0
+                self.emg_values[n] = self.emg_values[n] + n
+            ####################################################
 
-            ####
-
+            ####################################################
+            # Sending data to chart
             self.plotHandler.lines[0].buffer.put(self.emg_values[0])
             self.plotHandler.lines[1].buffer.put(self.emg_values[1])
             self.plotHandler.lines[2].buffer.put(self.emg_values[2])
             self.plotHandler.lines[3].buffer.put(self.emg_values[3])
+            ####################################################
 
 
 def test():
