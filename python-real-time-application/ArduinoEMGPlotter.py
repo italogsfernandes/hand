@@ -147,6 +147,76 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
     # def apply_moving_average_high_pass_filter(self, input_array, window_size):
     # def apply_ajusts_for_simulation(self, raw_emg_values)
 
+    @staticmethod
+    def get_rms_feature(input_array):
+        return np.sqrt(np.mean(np.square(
+           input_array)))
+
+    @staticmethod
+    def get_zc_feature(input_array):
+        s3= np.sign(
+         input_array)
+        s3[s3==0] = -1     # replace zeros with -1
+        return (np.where(np.diff(s3)))[0].shape[0]
+
+    @staticmethod
+    def get_mav_feature(input_array):
+        return np.mean(np.abs(
+                input_array))
+
+    @staticmethod
+    def get_var_feature(input_array):
+        return np.var(
+                input_array)
+
+    @staticmethod
+    def get_wl_feature(input_array):
+        return np.sum(np.abs(np.diff(
+                input_array)))
+
+    @staticmethod
+    def get_ssc_feature(input_array):
+        return np.where(np.diff(np.sign(np.diff(
+                input_array))))[0].shape[0]
+
+    def apply_feature_extraction(self):
+        ########
+        # RMS
+        self.ch1_features['rms'] = ArduinoEMGPlotter.get_rms_feature(self.ch1_features_window)
+        self.ch2_features['rms'] = ArduinoEMGPlotter.get_rms_feature(self.ch2_features_window)
+        self.ch3_features['rms'] = ArduinoEMGPlotter.get_rms_feature(self.ch3_features_window)
+        self.ch4_features['rms'] = ArduinoEMGPlotter.get_rms_feature(self.ch4_features_window)
+        ########
+        # ZC
+        self.ch1_features['zc'] = ArduinoEMGPlotter.get_zc_feature(self.ch1_features_window)
+        self.ch2_features['zc'] = ArduinoEMGPlotter.get_zc_feature(self.ch2_features_window)
+        self.ch3_features['zc'] = ArduinoEMGPlotter.get_zc_feature(self.ch3_features_window)
+        self.ch4_features['zc'] = ArduinoEMGPlotter.get_zc_feature(self.ch4_features_window)
+        ########
+        # MAV
+        self.ch1_features['mav'] = ArduinoEMGPlotter.get_mav_feature(self.ch1_features_window)
+        self.ch2_features['mav'] = ArduinoEMGPlotter.get_mav_feature(self.ch2_features_window)
+        self.ch3_features['mav'] = ArduinoEMGPlotter.get_mav_feature(self.ch3_features_window)
+        self.ch4_features['mav'] = ArduinoEMGPlotter.get_mav_feature(self.ch4_features_window)
+        ########
+        # VAR
+        self.ch1_features['var'] = ArduinoEMGPlotter.get_var_feature(self.ch1_features_window)
+        self.ch2_features['var'] = ArduinoEMGPlotter.get_var_feature(self.ch2_features_window)
+        self.ch3_features['var'] = ArduinoEMGPlotter.get_var_feature(self.ch3_features_window)
+        self.ch4_features['var'] = ArduinoEMGPlotter.get_var_feature(self.ch4_features_window)
+        ########
+        # WL
+        self.ch1_features['wl'] = ArduinoEMGPlotter.get_wl_feature(self.ch1_features_window)
+        self.ch2_features['wl'] = ArduinoEMGPlotter.get_wl_feature(self.ch2_features_window)
+        self.ch3_features['wl'] = ArduinoEMGPlotter.get_wl_feature(self.ch3_features_window)
+        self.ch4_features['wl'] = ArduinoEMGPlotter.get_wl_feature(self.ch4_features_window)
+        ########
+        # SSC
+        self.ch1_features['ssc'] = ArduinoEMGPlotter.get_ssc_feature(self.ch1_features_window)
+        self.ch2_features['ssc'] = ArduinoEMGPlotter.get_ssc_feature(self.ch2_features_window)
+        self.ch3_features['ssc'] = ArduinoEMGPlotter.get_ssc_feature(self.ch3_features_window)
+        self.ch4_features['ssc'] = ArduinoEMGPlotter.get_ssc_feature(self.ch4_features_window)
+
     def consumer_function(self):
         """ If there are some data in the queue, add this to the plot.
         """
@@ -204,7 +274,11 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
 
             ####################################################
             # Extracting features
-
+            if self.features_window_index == self.features_window_overlap:
+                # if I had completed a window and i'm ready to start the next one
+                self.apply_feature_extraction()
+                # TODO: Plot features
+                #self.send_features_to_plot()
             ####################################################
 
 
