@@ -82,11 +82,13 @@ class QtArduinoPlotter:
         consumerThread : for redirect the data from the arduino to the plotter.
         arduinoHandler : serial port acquisition with a thread.
         """
-        self.started = True
-        self.timerStatus.start()
-        self.plotHandler.timer.start(0)
-        self.consumerThread.start()
-        self.arduinoHandler.start_acquisition()
+        self.arduinoHandler.open()
+        if self.arduinoHandler.serialPort.isOpen():
+            self.started = True
+            self.timerStatus.start()
+            self.plotHandler.timer.start(0)
+            self.consumerThread.start()
+            self.arduinoHandler.start_acquisition()
 
     def stop(self):
         """

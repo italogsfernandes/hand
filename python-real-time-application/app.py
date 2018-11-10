@@ -51,15 +51,29 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.cb_ch3.toggle() # enabling visibility of channel
         self.cb_ch4.toggle() # enabling visibility of channel
 
+        # trying to start acquisition
+        try:
+            self.emg_app.start()
+            self.actionStartAcquisition.setText("Stop Acquisition")
+        except Exception as e:
+            self.statusbar.showMessage("Not possible to automatically start. Please verify USB connection.")
+            self.lbl_status.setText("Select Functions -> Start Acquisition for start.")
+
     def setup_signals_connections(self):
         """ Connects the events of objects in the view (buttons, combobox, etc)
         to respective methods.
         """
         self.actionStartAcquisition.triggered.connect(self.start_stop_acquisition)
+        self.actionFind_Serial_Port.triggered.connect(self.find_serial_port)
         self.cb_ch1.toggled.connect(lambda x: self.emg_app.plotHandler.lines[0].set_visible(x))
         self.cb_ch2.toggled.connect(lambda x: self.emg_app.plotHandler.lines[1].set_visible(x))
         self.cb_ch3.toggled.connect(lambda x: self.emg_app.plotHandler.lines[2].set_visible(x))
         self.cb_ch4.toggled.connect(lambda x: self.emg_app.plotHandler.lines[3].set_visible(x))
+
+    def find_serial_port(self):
+        bar_foo = self.emg_app.arduinoHandler.update_port_name()
+        self.statusbar.showMessage(bar_foo)
+        self.lbl_status.setText(bar_foo)
 
     def closeEvent(self, q_close_event):
         self.emg_app.stop()
@@ -67,8 +81,11 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
 
     def start_stop_acquisition(self):
         if not self.emg_app.started:
-            self.emg_app.start()
-            self.actionStartAcquisition.setText("Stop Acquisition")
+            try:
+                self.emg_app.start()
+                self.actionStartAcquisition.setText("Stop Acquisition")
+            except Exception as e:
+                self.statusbar.showMessage("Not possible to start (" + str(e) +").")
         else:
             self.emg_app.stop()
             self.actionStartAcquisition.setText("Start Acquisition")

@@ -72,7 +72,6 @@
          </layout>
         </item>
        </layout>
-       <zorder>label_replace</zorder>
        <zorder></zorder>
       </widget>
       <widget class="QWidget" name="tab_features">
@@ -118,9 +117,11 @@
    </widget>
    <widget class="QMenu" name="menuFunctions">
     <property name="title">
-     <string>Functions</string>
+     <string>Options</string>
     </property>
     <addaction name="actionStartAcquisition"/>
+    <addaction name="separator"/>
+    <addaction name="actionFind_Serial_Port"/>
    </widget>
    <addaction name="menuArquivo"/>
    <addaction name="menuHelp"/>
@@ -294,6 +295,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionFind_Serial_Port">
+   <property name="text">
+    <string>Find Serial Port</string>
    </property>
   </action>
  </widget>

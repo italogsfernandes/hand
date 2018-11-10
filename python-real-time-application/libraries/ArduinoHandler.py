@@ -69,12 +69,25 @@ class ArduinoHandler:
         self.qnt_ch = qnt_ch
         if port_name is None:
             port_name = ArduinoHandler.get_arduino_serial_port()
-        self.serial_tools_obj = [s for s in serial_tools.comports() if s.device == port_name][0]
+        self.serial_tools_obj = None
+        if len(serial_tools.comports()):
+            self.serial_tools_obj = [s for s in serial_tools.comports() if s.device == port_name][0]
         self.serialPort = serial.Serial()
         self.serialPort.port = port_name
         self.serialPort.baudrate = baudrate
         self.thread_acquisition = ThreadHandler(self.acquire_routine, self.close)
         self.buffer_acquisition = Queue(1024)
+
+    def update_port_name(self):
+        self.serial_tools_obj = None
+        self.serialPort.port = ArduinoHandler.get_arduino_serial_port()
+
+        if len(serial_tools.comports()):
+            self.serial_tools_obj = [s for s in serial_tools.comports() if s.device == str(self.serialPort.name)][0]
+        if not self.serial_tools_obj is None:
+            return self.serial_tools_obj.description + " on " + self.serialPort.port
+        else:
+            return "Nothing found."
 
     @property
     def data_waiting(self):
