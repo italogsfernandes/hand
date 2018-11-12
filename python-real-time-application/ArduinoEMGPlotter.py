@@ -225,6 +225,15 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
     def consumer_function(self):
         """ If there are some data in the queue, add this to the plot.
         """
+        ################################
+        #TODO: to plot features
+        #TODO: On/off button in chart
+        #TODO: record raw data
+        #TODO: screen for saving a "coleta", to be used as a dataset
+        #TODO: Screen for design a RNA and save it
+        #TODO: Training screen
+        #TODO: Options checkbox for what is included in the pre processing and processing
+        ################################
         if self.arduinoHandler.data_waiting:
             self.emg_values = np.array(self.arduinoHandler.buffer_acquisition.get(), dtype=float)
             self.emg_values = self.emg_values * 5.0/1024.0 - 2.5
