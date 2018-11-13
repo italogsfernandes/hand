@@ -14,6 +14,7 @@ from pyqtgraph.Qt import QtCore
 import pyqtgraph as pg
 from pyqtgraph.ptime import time
 from numpy import clip
+import numpy as np
 
 import sys
 if sys.version_info.major == 3:
@@ -27,7 +28,7 @@ elif sys.version_info.major == 2:
 
 
 class BarGraphSeries:
-    def __init__(self, parent=None, pen=(0, 0, 255), name="Curve"):
+    def __init__(self, parent=None, pen='b', name="Curve"):
         """
         Initializes a custom BarGraphCurve
         :param parent: The parent, it should contains a PyQtPlotWidget that will own this curve.
@@ -36,11 +37,21 @@ class BarGraphSeries:
         """
         self.parent = parent  # Save the parent in a attribute.
         self.values = np.zeros(self.parent.qnt_channels)  # Initilizes a zero-filled vector
+        self.x_data = np.arange(1,self.parent.qnt_channels+1)
+        self.offset_x = 0
         # Creates and adds the curve to the plotwidget.
-        self.curve = pg.BarGraphItem(x=np.arange(1,self.parent.qnt_channels+1),
-                                     height=self.values, width=0.3, pen=pen)
-                                     #NOTE: talvez trocar pen por brush='r'
-        self.visible = True
+        self.curve = pg.BarGraphItem(x=self.x_data+self.offset_x,
+                                     height=self.values,
+                                     width=0.75,
+                                     brush=QBrush(pen))
+
+        self.curve.setOpts(fillLevel=0)
+        self.curve.setOpts(fill=True)
+
+        self.parent.plotWidget.addItem(self.curve)
+
+        self.visible = False
+        self.waiting_change = True
 
     def set_visible(self, visible):
         """
@@ -53,19 +64,16 @@ class BarGraphSeries:
         else:
             self.parent.plotWidget.addItem(self.curve)
 
+        self.parent.update_offsets()
+
+    def plot(self, plt_values):
+        self.values = plt_values
+        self.waiting_change = True
+
     def update_values(self):
-        self.curve.setData(self.values)
+        self.curve.setOpts(height=self.values)
 
-    def get_buffers_status(self):
-        """
-        Returns a string like:
-            Plot:    4/1024
-        :return: A string containing the status of the plot buffer for this curve.
-        """
-        return "Plot: %4d" % (self.buffer.qsize()) + '/' + str(self.buffer.maxsize)
-
-
-class PyQtGraphHandler:
+class FeaturesPlotHandler:
     def __init__(self, qnt_channels=4, parent=None, app=None):
         self.app = app
         self.qnt_channels = qnt_channels
@@ -73,7 +81,13 @@ class PyQtGraphHandler:
         self.plotWidget = pg.PlotWidget(parent)
 
         self.series = [None] * 6 # amount of features = 6
-        self.series[0] = BarGraphSeries(self, (0, 0, 255), "Values")
+        self.series[0] = BarGraphSeries(self, QColor.fromRgb(150, 0, 0), "RMS")
+        self.series[1] = BarGraphSeries(self, QColor.fromRgb(0, 150, 0), "ZC")
+        self.series[2] = BarGraphSeries(self, QColor.fromRgb(0, 0, 150), "MAV")
+        self.series[3] = BarGraphSeries(self, QColor.fromRgb(150, 0, 150), "VAR")
+        self.series[4] = BarGraphSeries(self, QColor.fromRgb(0, 150, 150), "WL")
+        self.series[5] = BarGraphSeries(self, QColor.fromRgb(150, 150, 0), "SSC")
+
         self.configure_plot()
 
         self.timer = QtCore.QTimer()
@@ -82,9 +96,34 @@ class PyQtGraphHandler:
         self.show_fps = True
         self.lastTime = 0
         self.fps = 0
-        # 1) Simplest approach -- update data in the array such that plot appears to scroll
-        # 2) Allow data to accumulate. In these examples, the array doubles in length
-        #    whenever it is full.
+        self.qnt_visible_ch = 1
+        self.get_qnt_visible_ch()
+
+    def get_qnt_visible_ch(self):
+        self.qnt_visible_ch = 0
+        for serie in self.series:
+            if serie.visible:
+                self.qnt_visible_ch += 1
+        if self.qnt_visible_ch == 0:
+            self.qnt_visible_ch = 1
+        return self.qnt_visible_ch
+
+    def update_offsets(self):
+        self.get_qnt_visible_ch()
+        #print(self.qnt_visible_ch)
+        width = 0.75
+        lower_lim = -width/2.0
+        half_width = width/2.0
+        #print("%f | %f" %(lower_lim, half_width))
+
+        offset = lower_lim + half_width/(self.qnt_visible_ch)
+        for serie in self.series:
+            if serie.visible:
+                #print(offset)
+                serie.offset_x = offset
+                serie.curve.setOpts(x=serie.x_data+serie.offset_x)
+                serie.curve.setOpts(width=width/self.qnt_visible_ch)
+                offset = offset + width/(self.qnt_visible_ch)
 
     def update(self):
         """
@@ -94,11 +133,13 @@ class PyQtGraphHandler:
         If defined it can show the refresh rate (fps) in the plot title.
         If defined it can force the app to update every time that this method runs.
         """
-        self.series.update_values()
+        for serie in self.series:
+            if serie.waiting_change:
+                serie.update_values()
 
         if self.show_fps:
             self.calculate_fps()
-            self.plotWidget.setTitle('<font color="red">%0.2f fps</font>' % self.fps)
+            self.plotWidget.setTitle('<font color="red">%d fps</font>' % int(self.fps))
 
         if self.app is not None:
             self.app.processEvents()
@@ -139,21 +180,22 @@ class PyQtGraphHandler:
         :param y_title: The y axis label.
         :param y_unit: The unit names of the y axis.
         """
-        self.plotWidget.showGrid(True, True)
+        self.plotWidget.showGrid(False, True)
         # Colors:
-        self.plotWidget.setBackgroundBrush(QBrush(QColor.fromRgb(255, 255, 255)))
-        self.plotWidget.getAxis('left').setPen(QPen(QColor.fromRgb(0, 0, 0)))
-        self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
-        self.plotWidget.getAxis('left').setPen(QPen(QColor.fromRgb(0, 0, 0)))
-        self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
+        #self.plotWidget.setBackgroundBrush(QBrush(QColor.fromRgb(255, 255, 255)))
+        #self.plotWidget.getAxis('left').setPen(QPen(QColor.fromRgb(0, 0, 0)))
+        #self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
+        #self.plotWidget.getAxis('left').setPen(QPen(QColor.fromRgb(0, 0, 0)))
+        #self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
         # Axis:
-        self.plotWidget.setXRange(0, self.qnt_points)
-        self.plotWidget.setYRange(self.__y_range[0], self.__y_range[1])
+        self.plotWidget.setXRange(0, self.qnt_channels+1)
+        self.plotWidget.setYRange(0, 1)
         self.plotWidget.setLabel('bottom', x_title, units=x_unit)
         self.plotWidget.setLabel('left', y_title, units=y_unit)
 
     def configure_title(self, title="Graph"):
-        """
+        """pg.setConfigOption('background', 'w')
+pg.setConfigOption('foreground', 'k')
         Sets the title of the plot.
         :param title: String to be showed in the title of this plot.
         """
@@ -208,21 +250,24 @@ def test():
     vertical_layout = QtGui.QVBoxLayout(central_widget)
 
     plot_handler = FeaturesPlotHandler(parent=central_widget)
-    plot_handler.series[0].plot(np.random.normal(0,1,4))
-    plot_handler.series[1].plot(np.random.normal(0,1,4))
-    plot_handler.series[2].plot(np.random.normal(0,1,4))
-    plot_handler.series[3].plot(np.random.normal(0,1,4))
-    plot_handler.series[4].plot(np.random.normal(0,1,4))
-    plot_handler.series[5].plot(np.random.normal(0,1,4))
+    plot_handler.series[0].plot([0.5, 0.6, 0.5, 0.6])
+    plot_handler.series[1].plot([0.4, 0.7, 0.6, 0.4])
+    plot_handler.series[2].plot([0.5, 0.4, 0.7, 0.4])
+    plot_handler.series[0].set_visible(True)
+    plot_handler.series[1].set_visible(True)
+    plot_handler.series[2].set_visible(True)
+    for serie in plot_handler.series:
+        serie.update_values()
 
-    plot_handler.timer.start(0)
+    plot_handler.update_offsets()
+    #plot_handler.timer.start(33)
 
     vertical_layout.addWidget(plot_handler.plotWidget)
     form.setCentralWidget(central_widget)
     form.show()
     app.exec_()
 
-    plot_handler.timer.stop()
+    #plot_handler.timer.stop()
 
 if __name__ == '__main__':
-    example1()
+    test()
