@@ -148,7 +148,7 @@ class FeaturesPlotHandler:
 
         if self.show_fps:
             self.calculate_fps()
-            self.plotWidget.setTitle('Feature Extraction  <font color="red">%d fps</font>' % int(self.fps))
+            self.plotWidget.setTitle('Feature Extraction - <font color="red">%d ms</font>' % int(self.fps))
 
         if self.app is not None:
             self.app.processEvents()
@@ -165,7 +165,7 @@ class FeaturesPlotHandler:
             self.fps = 1.0 / dt
         else:
             s = clip(dt * 3., 0, 1)
-            self.fps = self.fps * (1 - s) + (1.0 / dt) * s
+            self.fps = dt*1000 #self.fps * (1 - s) + (1.0 / dt) * s
 
     def start_update(self):
         self.timer.start(33)

@@ -36,7 +36,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_EMG">
        <attribute name="title">
@@ -202,10 +202,30 @@
        <attribute name="title">
         <string>Classification</string>
        </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QGraphicsView" name="graphicsView_classification"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_ann">
+       <attribute name="title">
+        <string>ANN Topography</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QGraphicsView" name="graphicsView_ann"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>SVM Settings</string>
+       </attribute>
       </widget>
       <widget class="QWidget" name="tab_settings">
        <attribute name="title">
-        <string>Settings</string>
+        <string>General Settings</string>
        </attribute>
       </widget>
      </widget>
