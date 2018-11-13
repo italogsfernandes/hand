@@ -11,6 +11,7 @@
 # Description:
 # ------------------------------------------------------------------------------
 from EMGPlotHandler import EMGPlotHandler
+from FeaturesPlotHandler import FeaturesPlotHandler
 from libraries.QtArduinoPlotter import QtArduinoPlotter
 from libraries.ArduinoHandler import ArduinoHandler
 # ------------------------------------------------------------------------------
@@ -95,6 +96,9 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         QtArduinoPlotter.__init__(self, parent, app, label)
         self.arduinoHandler = ArduinoHandler(qnt_ch=4)
         self.process = EMGProcessing()
+        self.feature_plot_handler = FeaturesPlotHandler(qnt_channels=4,
+                                                        parent=parent,
+                                                        app=app)
         self.plotHandler.lines[0].set_visible(True)
         self.plotHandler.lines[1].set_visible(False)
         self.plotHandler.lines[2].set_visible(False)
@@ -146,6 +150,39 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         """
         self.plotHandler = EMGPlotHandler(qnt_points=4096, parent=parent, y_range=(-0.3, 3.3),
                                           app=app)
+
+    def start(self):
+        """
+        Set a started flag to True and starts the following tasks: (in this order)
+        timerStatus : for updating the status label.
+        plotHandler : timer for updating the plot.
+        consumerThread : for redirect the data from the arduino to the plotter.
+        arduinoHandler : serial port acquisition with a thread.
+        """
+        self.arduinoHandler.open()
+        if self.arduinoHandler.serialPort.isOpen():
+            self.started = True
+            self.timerStatus.start()
+            self.plotHandler.timer.start(0)
+            self.feature_plot_handler.start_update()
+            self.consumerThread.start()
+            self.arduinoHandler.start_acquisition()
+
+    def stop(self):
+        """
+        Set a started flag to False and stops the following tasks: (in this order)
+        arduinoHandler : serial port acquisition with a thread.
+        consumerThread : for redirect the data from the arduino to the plotter.
+        timerStatus : for updating the status label.
+        plotHandler : timer for updating the plot.
+        """
+        self.started = False
+        self.arduinoHandler.stop_acquisition()
+        self.consumerThread.stop()
+        self.timerStatus.stop()
+        self.plotHandler.timer.stop()
+        self.feature_plot_handler.stop_update()
+
 
     #NOTE: I will put the process found inside the counsumer function inside this fuctions:
     # def add_to_mva_window(self, input_number, actual_mva_window):
@@ -222,6 +259,40 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.ch3_features['ssc'] = ArduinoEMGPlotter.get_ssc_feature(self.ch3_features_window)
         self.ch4_features['ssc'] = ArduinoEMGPlotter.get_ssc_feature(self.ch4_features_window)
 
+    def send_features_to_plot(self):
+        if self.feature_plot_handler.is_enabled:
+            ########
+            # RMS
+            if self.feature_plot_handler.series[0].visible:
+                self.feature_plot_handler.series[0].plot([self.ch1_features['rms'],
+                                                          self.ch2_features['rms'],
+                                                          self.ch3_features['rms'],
+                                                          self.ch4_features['rms']])
+            if self.feature_plot_handler.series[1].visible:
+                self.feature_plot_handler.series[1].plot([self.ch1_features['zc'],
+                                                          self.ch2_features['zc'],
+                                                          self.ch3_features['zc'],
+                                                          self.ch4_features['zc']])
+            if self.feature_plot_handler.series[2].visible:
+                self.feature_plot_handler.series[2].plot([self.ch1_features['mav'],
+                                                          self.ch2_features['mav'],
+                                                          self.ch3_features['mav'],
+                                                          self.ch4_features['mav']])
+            if self.feature_plot_handler.series[3].visible:
+                self.feature_plot_handler.series[3].plot([self.ch1_features['var'],
+                                                          self.ch2_features['var'],
+                                                          self.ch3_features['var'],
+                                                          self.ch4_features['var']])
+            if self.feature_plot_handler.series[4].visible:
+                self.feature_plot_handler.series[4].plot([self.ch1_features['wl'],
+                                                          self.ch2_features['wl'],
+                                                          self.ch3_features['wl'],
+                                                          self.ch4_features['wl']])
+            if self.feature_plot_handler.series[5].visible:
+                self.feature_plot_handler.series[5].plot([self.ch1_features['ssc'],
+                                                          self.ch2_features['ssc'],
+                                                          self.ch3_features['ssc'],
+                                                          self.ch4_features['ssc']])
     def consumer_function(self):
         """ If there are some data in the queue, add this to the plot.
         """
@@ -291,8 +362,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
             if self.features_window_index == self.features_window_overlap:
                 # if I had completed a window and i'm ready to start the next one
                 self.apply_feature_extraction()
-                # TODO: Plot features
-                #self.send_features_to_plot()
+                self.send_features_to_plot()
             ####################################################
 
 

@@ -39,7 +39,9 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         # Object to acquire EMG signals and plot it (using the serial port).
         self.emg_app = ArduinoEMGPlotter(parent=self.centralwidget,label=self.lbl_status)
 
+        ####################
         ###### Some Ui modifications
+        ### Combo box features
         self.cb_features.addItems(("RMS - Root Mean Square",
                                    "ZC - Zero Crossing",
                                    "MAV - Mean Absolute Value",
@@ -47,6 +49,8 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
                                    "WL - Wave Length",
                                    "SSC - Slope Signal Change"))
         self.cb_features.currentIndex = 0
+
+        #### Chart EMG
         # Adding object to a specific place in the layout
         self.verticalLayoutGraph.addWidget(self.emg_app.plotHandler.plotWidget)
         # for design reasons I put a label widged in the place, now I need to
@@ -54,12 +58,24 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.verticalLayoutGraph.removeWidget(self.label_replace)
         self.label_replace.setParent(None)
 
+        #### Chart Features
+        # Adding object to a specific place in the layout
+        self.verticalLayoutGraph_features.addWidget(self.emg_app.feature_plot_handler.plotWidget)
+        # for design reasons I put a label widged in the place, now I need to
+        # remove it
+        self.verticalLayoutGraph_features.removeWidget(self.label_replace_features)
+        self.label_replace_features.setParent(None)
 
         # Setting up inicial conditions:
         self.cb_ch1.toggle() # enabling visibility of channel
         self.cb_ch2.toggle() # enabling visibility of channel
         self.cb_ch3.toggle() # enabling visibility of channel
         self.cb_ch4.toggle() # enabling visibility of channel
+
+        self.emg_app.feature_plot_handler.series[0].set_visible(True)
+        self.emg_app.feature_plot_handler.series[2].set_visible(True)
+        self.emg_app.feature_plot_handler.series[2].set_visible(False)
+        self.emg_app.feature_plot_handler.series[2].set_visible(True)
 
         # trying to start acquisition
         try:

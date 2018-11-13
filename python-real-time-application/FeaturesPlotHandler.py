@@ -35,6 +35,8 @@ class BarGraphSeries:
         :param pen: The RGB color of the curve. Default is blue.
         :param name: The name of the curve. Default is 'Curve'
         """
+        self.name = name
+        self.pen = pen
         self.parent = parent  # Save the parent in a attribute.
         self.values = np.zeros(self.parent.qnt_channels)  # Initilizes a zero-filled vector
         self.x_data = np.arange(1,self.parent.qnt_channels+1)
@@ -61,8 +63,10 @@ class BarGraphSeries:
         self.visible = visible  # Save the argument as as attribute
         if not self.visible:
             self.parent.plotWidget.removeItem(self.curve)
+            self.parent.legend.removeItem(self.name)
         else:
             self.parent.plotWidget.addItem(self.curve)
+            self.parent.legend.addItem(self.curve, self.name)
 
         self.parent.update_offsets()
 
@@ -71,6 +75,9 @@ class BarGraphSeries:
         self.waiting_change = True
 
     def update_values(self):
+        #if np.max(self.values) > self.parent.plotWidget.ylim[1]:
+        #    self.plotWidget.setYRange(0, np.max(self.values))
+
         self.curve.setOpts(height=self.values)
 
 class FeaturesPlotHandler:
@@ -79,6 +86,7 @@ class FeaturesPlotHandler:
         self.qnt_channels = qnt_channels
 
         self.plotWidget = pg.PlotWidget(parent)
+        self.legend = self.plotWidget.addLegend()
 
         self.series = [None] * 6 # amount of features = 6
         self.series[0] = BarGraphSeries(self, QColor.fromRgb(150, 0, 0), "RMS")
@@ -98,6 +106,7 @@ class FeaturesPlotHandler:
         self.fps = 0
         self.qnt_visible_ch = 1
         self.get_qnt_visible_ch()
+        self.is_enabled = False
 
     def get_qnt_visible_ch(self):
         self.qnt_visible_ch = 0
@@ -139,7 +148,7 @@ class FeaturesPlotHandler:
 
         if self.show_fps:
             self.calculate_fps()
-            self.plotWidget.setTitle('<font color="red">%d fps</font>' % int(self.fps))
+            self.plotWidget.setTitle('Feature Extraction  <font color="red">%d fps</font>' % int(self.fps))
 
         if self.app is not None:
             self.app.processEvents()
@@ -157,6 +166,14 @@ class FeaturesPlotHandler:
         else:
             s = clip(dt * 3., 0, 1)
             self.fps = self.fps * (1 - s) + (1.0 / dt) * s
+
+    def start_update(self):
+        self.timer.start(33)
+        self.is_enabled = True
+
+    def stop_update(self):
+        self.timer.stop()
+        self.is_enabled = False
 
     def configure_plot(self):
         """
@@ -182,16 +199,19 @@ class FeaturesPlotHandler:
         """
         self.plotWidget.showGrid(False, True)
         # Colors:
-        #self.plotWidget.setBackgroundBrush(QBrush(QColor.fromRgb(255, 255, 255)))
-        #self.plotWidget.getAxis('left').setPen(QPen(QColor.fromRgb(0, 0, 0)))
-        #self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
-        #self.plotWidget.getAxis('left').setPen(QPen(QColor.fromRgb(0, 0, 0)))
-        #self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
+        self.plotWidget.setBackgroundBrush(QBrush(QColor.fromRgb(255, 255, 255)))
+        self.plotWidget.getAxis('left').setPen(QPen(QColor.fromRgb(0, 0, 0)))
+        self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
+        self.plotWidget.getAxis('left').setPen(QPen(QColor.fromRgb(0, 0, 0)))
+        self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
         # Axis:
         self.plotWidget.setXRange(0, self.qnt_channels+1)
-        self.plotWidget.setYRange(0, 1)
+        self.plotWidget.setYRange(0, 0.2)
         self.plotWidget.setLabel('bottom', x_title, units=x_unit)
         self.plotWidget.setLabel('left', y_title, units=y_unit)
+
+
+
 
     def configure_title(self, title="Graph"):
         """pg.setConfigOption('background', 'w')
