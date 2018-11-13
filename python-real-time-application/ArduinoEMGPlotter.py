@@ -304,10 +304,11 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
 
             ####################################################
             # Sending data to chart
-            self.plotHandler.lines[0].buffer.put(self.emg_values[0])
-            self.plotHandler.lines[1].buffer.put(self.emg_values[1])
-            self.plotHandler.lines[2].buffer.put(self.emg_values[2])
-            self.plotHandler.lines[3].buffer.put(self.emg_values[3])
+            if self.plotHandler.is_enabled:
+                self.plotHandler.lines[0].buffer.put(self.emg_values[0])
+                self.plotHandler.lines[1].buffer.put(self.emg_values[1])
+                self.plotHandler.lines[2].buffer.put(self.emg_values[2])
+                self.plotHandler.lines[3].buffer.put(self.emg_values[3])
             ####################################################
 
 

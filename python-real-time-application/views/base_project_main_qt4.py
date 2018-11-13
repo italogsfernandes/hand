@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'layouts/base_project_main.ui'
+# Form implementation generated from reading ui file 'views/layouts/base_project_main.ui'
 #
 # Created by: PyQt4 UI code generator 4.12.1
 #
@@ -68,9 +68,10 @@ class Ui_MainWindow(object):
         self.lbl_status.setSizePolicy(sizePolicy)
         self.lbl_status.setObjectName(_fromUtf8("lbl_status"))
         self.horizontalLayout_3.addWidget(self.lbl_status)
-        self.checkBox = QtGui.QCheckBox(self.tab_EMG)
-        self.checkBox.setObjectName(_fromUtf8("checkBox"))
-        self.horizontalLayout_3.addWidget(self.checkBox)
+        self.cb_chart_emg_on_off = QtGui.QCheckBox(self.tab_EMG)
+        self.cb_chart_emg_on_off.setChecked(True)
+        self.cb_chart_emg_on_off.setObjectName(_fromUtf8("cb_chart_emg_on_off"))
+        self.horizontalLayout_3.addWidget(self.cb_chart_emg_on_off)
         self.verticalLayoutGraphStatus.addLayout(self.horizontalLayout_3)
         self.horizontalLayout_2.addLayout(self.verticalLayoutGraphStatus)
         self.tabWidget.addTab(self.tab_EMG, _fromUtf8(""))
@@ -195,7 +196,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Project Main", None))
         self.label_replace.setText(_translate("MainWindow", "Here will be the chart", None))
         self.lbl_status.setText(_translate("MainWindow", "Status:", None))
-        self.checkBox.setText(_translate("MainWindow", "CheckBox", None))
+        self.cb_chart_emg_on_off.setText(_translate("MainWindow", "Chart On/Off", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_EMG), _translate("MainWindow", "EMG", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_features), _translate("MainWindow", "Features", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_classification), _translate("MainWindow", "Classification", None))

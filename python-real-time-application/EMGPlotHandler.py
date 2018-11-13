@@ -42,8 +42,20 @@ class EMGPlotHandler(PyQtGraphHandler):
         self.lines[1] = PyQtGraphSeries(self, pen=(90, 200, 90), name="CH 2")
         self.lines[2] = PyQtGraphSeries(self, pen=(30, 100, 10), name="CH 3")
         self.lines[3] = PyQtGraphSeries(self, pen=(255, 0, 0), name="CH 4")
+        self.is_enabled = True
+
+    def disable(self):
+        self.timer.stop()
+        self.is_enabled = False
+        for chart_line in self.lines:
+            chart_line.buffer.empty()
+
+    def enable(self):
+        self.timer.start()
+        self.is_enabled = True
 
     def update(self):
+
         """
         This method is called automatically, you should not call it by yourself.
 

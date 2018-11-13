@@ -81,9 +81,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox">
+             <widget class="QCheckBox" name="cb_chart_emg_on_off">
               <property name="text">
-               <string>CheckBox</string>
+               <string>Chart On/Off</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>

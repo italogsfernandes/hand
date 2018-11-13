@@ -69,11 +69,22 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.cb_ch2.toggled.connect(lambda x: self.emg_app.plotHandler.lines[1].set_visible(x))
         self.cb_ch3.toggled.connect(lambda x: self.emg_app.plotHandler.lines[2].set_visible(x))
         self.cb_ch4.toggled.connect(lambda x: self.emg_app.plotHandler.lines[3].set_visible(x))
+        self.cb_chart_emg_on_off.toggled.connect(self.turn_chart_emg_on_off)
+        self.tabWidget.currentChanged.connect(self.tab_changed)
 
+    def tab_changed(self, tab_index):
+        print("tab changed: " + str(tab_index))
+        
     def find_serial_port(self):
         bar_foo = self.emg_app.arduinoHandler.update_port_name()
         self.statusbar.showMessage(bar_foo)
         self.lbl_status.setText(bar_foo)
+
+    def turn_chart_emg_on_off(self, cb_value):
+        if self.emg_app.plotHandler.is_enabled:
+            self.emg_app.plotHandler.disable()
+        else:
+            self.emg_app.plotHandler.enable()
 
     def closeEvent(self, q_close_event):
         self.emg_app.stop()
