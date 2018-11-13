@@ -38,12 +38,22 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
 
         # Object to acquire EMG signals and plot it (using the serial port).
         self.emg_app = ArduinoEMGPlotter(parent=self.centralwidget,label=self.lbl_status)
+
+        ###### Some Ui modifications
+        self.cb_features.addItems(("RMS - Root Mean Square",
+                                   "ZC - Zero Crossing",
+                                   "MAV - Mean Absolute Value",
+                                   "VAR - Variance",
+                                   "WL - Wave Length",
+                                   "SSC - Slope Signal Change"))
+        self.cb_features.currentIndex = 0
         # Adding object to a specific place in the layout
         self.verticalLayoutGraph.addWidget(self.emg_app.plotHandler.plotWidget)
         # for design reasons I put a label widged in the place, now I need to
         # remove it
         self.verticalLayoutGraph.removeWidget(self.label_replace)
         self.label_replace.setParent(None)
+
 
         # Setting up inicial conditions:
         self.cb_ch1.toggle() # enabling visibility of channel
@@ -73,8 +83,14 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.tabWidget.currentChanged.connect(self.tab_changed)
 
     def tab_changed(self, tab_index):
-        print("tab changed: " + str(tab_index))
-        
+        if tab_index == 0:
+            self.emg_app.plotHandler.enable()
+            print("enabled")
+        else:
+            self.emg_app.plotHandler.disable()
+            print("disabled")
+
+
     def find_serial_port(self):
         bar_foo = self.emg_app.arduinoHandler.update_port_name()
         self.statusbar.showMessage(bar_foo)
