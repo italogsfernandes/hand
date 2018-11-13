@@ -72,10 +72,12 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.cb_ch3.toggle() # enabling visibility of channel
         self.cb_ch4.toggle() # enabling visibility of channel
 
-        self.emg_app.feature_plot_handler.series[0].set_visible(True)
-        self.emg_app.feature_plot_handler.series[2].set_visible(True)
-        self.emg_app.feature_plot_handler.series[2].set_visible(False)
-        self.emg_app.feature_plot_handler.series[2].set_visible(True)
+        self.emg_app.feature_plot_handler.series[0].set_visible(True) # 0.3
+        self.emg_app.feature_plot_handler.series[1].set_visible(True) # 100.0
+        self.emg_app.feature_plot_handler.series[2].set_visible(True) # 0.2
+        self.emg_app.feature_plot_handler.series[3].set_visible(True) # 0.9
+        self.emg_app.feature_plot_handler.series[4].set_visible(True) # 55.0
+        self.emg_app.feature_plot_handler.series[5].set_visible(True) # 150.0
 
         # trying to start acquisition
         try:

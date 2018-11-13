@@ -206,7 +206,7 @@ class FeaturesPlotHandler:
         self.plotWidget.getAxis('bottom').setPen(QPen(QColor.fromRgb(0, 0, 0)))
         # Axis:
         self.plotWidget.setXRange(0, self.qnt_channels+1)
-        self.plotWidget.setYRange(0, 0.2)
+        self.plotWidget.setYRange(0, 1)
         self.plotWidget.setLabel('bottom', x_title, units=x_unit)
         self.plotWidget.setLabel('left', y_title, units=y_unit)
 

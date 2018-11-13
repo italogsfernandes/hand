@@ -130,6 +130,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.ch3_features = {}
         self.ch4_features = {}
 
+        self.division_factors = [0.3, 100.0, 0.2, 0.9, 55.0, 150.0]
         ######################################################
         #NOTE: Put it in another place, only for testing [END]
         ######################################################
@@ -222,6 +223,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                 input_array))))[0].shape[0]
 
     def apply_feature_extraction(self):
+
         ########
         # RMS
         self.ch1_features['rms'] = ArduinoEMGPlotter.get_rms_feature(self.ch1_features_window)
@@ -264,35 +266,35 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
             ########
             # RMS
             if self.feature_plot_handler.series[0].visible:
-                self.feature_plot_handler.series[0].plot([self.ch1_features['rms'],
+                self.feature_plot_handler.series[0].plot(np.array([self.ch1_features['rms'],
                                                           self.ch2_features['rms'],
                                                           self.ch3_features['rms'],
-                                                          self.ch4_features['rms']])
+                                                          self.ch4_features['rms']])/self.division_factors[0])
             if self.feature_plot_handler.series[1].visible:
-                self.feature_plot_handler.series[1].plot([self.ch1_features['zc'],
+                self.feature_plot_handler.series[1].plot(np.array([self.ch1_features['zc'],
                                                           self.ch2_features['zc'],
                                                           self.ch3_features['zc'],
-                                                          self.ch4_features['zc']])
+                                                          self.ch4_features['zc']])/self.division_factors[1])
             if self.feature_plot_handler.series[2].visible:
-                self.feature_plot_handler.series[2].plot([self.ch1_features['mav'],
+                self.feature_plot_handler.series[2].plot(np.array([self.ch1_features['mav'],
                                                           self.ch2_features['mav'],
                                                           self.ch3_features['mav'],
-                                                          self.ch4_features['mav']])
+                                                          self.ch4_features['mav']])/self.division_factors[2])
             if self.feature_plot_handler.series[3].visible:
-                self.feature_plot_handler.series[3].plot([self.ch1_features['var'],
+                self.feature_plot_handler.series[3].plot(np.array([self.ch1_features['var'],
                                                           self.ch2_features['var'],
                                                           self.ch3_features['var'],
-                                                          self.ch4_features['var']])
+                                                          self.ch4_features['var']])/self.division_factors[3])
             if self.feature_plot_handler.series[4].visible:
-                self.feature_plot_handler.series[4].plot([self.ch1_features['wl'],
+                self.feature_plot_handler.series[4].plot(np.array([self.ch1_features['wl'],
                                                           self.ch2_features['wl'],
                                                           self.ch3_features['wl'],
-                                                          self.ch4_features['wl']])
+                                                          self.ch4_features['wl']])/self.division_factors[4])
             if self.feature_plot_handler.series[5].visible:
-                self.feature_plot_handler.series[5].plot([self.ch1_features['ssc'],
+                self.feature_plot_handler.series[5].plot(np.array([self.ch1_features['ssc'],
                                                           self.ch2_features['ssc'],
                                                           self.ch3_features['ssc'],
-                                                          self.ch4_features['ssc']])
+                                                          self.ch4_features['ssc']])/self.division_factors[5])
     def consumer_function(self):
         """ If there are some data in the queue, add this to the plot.
         """
