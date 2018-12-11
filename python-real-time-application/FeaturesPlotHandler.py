@@ -108,6 +108,14 @@ class FeaturesPlotHandler:
         self.get_qnt_visible_ch()
         self.is_enabled = False
 
+    def enable(self):
+        self.is_enabled = False
+        print("Enabled")
+
+    def disable(self):
+        self.is_enabled = True
+        print("Disabled")
+
     def get_qnt_visible_ch(self):
         self.qnt_visible_ch = 0
         for serie in self.series:
