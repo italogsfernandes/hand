@@ -64,11 +64,12 @@ for ch in range(4):
     emg_pre_processed[:, ch] = emg_offset_60hz
     emg_envelope[:, ch] = emg_offset_60hz_envelope
 
+threshould = np.array([0.005, 0.005, 0.005, 0.005])
+
 ################################
 #%% plotting_signal_envelope
 ################################
 ax1 = plt.subplot(4,1,1)
-plt.plot(emg_pre_processed[:,0])
 plt.plot(emg_envelope[:,0])
 plt.title("CH1")
 ax2 = plt.subplot(4,1,2)
@@ -89,6 +90,31 @@ ax1.get_shared_y_axes().join(ax1, ax2, ax3, ax4)
 plt.tight_layout()
 plt.show()
 
+################################
+#%% plotting only envelope
+################################
+N = len(emg_envelope)
+ax1 = plt.subplot(4,1,1)
+plt.plot(emg_envelope[:,0])
+plt.plot(np.ones(N)*threshould[0])
+plt.title("CH1 - th: %.4f" % (threshould[0]))
+ax2 = plt.subplot(4,1,2)
+plt.plot(emg_envelope[:,1])
+plt.plot(np.ones(N)*threshould[1])
+plt.title("CH2 - th: %.4f" % (threshould[1]))
+ax3 = plt.subplot(4,1,3)
+plt.plot(emg_envelope[:,2])
+plt.plot(np.ones(N)*threshould[2])
+plt.title("CH3 - th: %.4f" % (threshould[2]))
+ax4 = plt.subplot(4,1,4)
+plt.plot(emg_envelope[:,3])
+plt.plot(np.ones(N)*threshould[3])
+plt.title("CH4 - th: %.4f" % (threshould[3]))
+
+ax1.get_shared_x_axes().join(ax1, ax2, ax3, ax4)
+ax1.get_shared_y_axes().join(ax1, ax2, ax3, ax4)
+plt.tight_layout()
+plt.show()
 
 ################################
 #%% super plot
@@ -127,6 +153,12 @@ ax1.get_shared_y_axes().join(ax1, ax2, ax3, ax11, ax12, ax13)
 plt.tight_layout()
 plt.show()
 '''
+
+#########################
+#%% Contraction Sites
+#########################
+
+
 #########################
 #%% Windowing
 #########################
