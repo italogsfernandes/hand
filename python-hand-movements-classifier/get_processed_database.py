@@ -220,9 +220,9 @@ plt.show()
 #########################
 #TODO
 
-#########################
+##################################################
 #%% Windowing considering contractions
-#########################
+##################################################
 emg_windowed = []
 windows_out_signal = []
 
@@ -238,3 +238,25 @@ for contraction_n in range(len(contractions_onsets)):
         emg_windowed.append(this_window)
         windows_out_signal.append(geral_contractions[current_index])
         current_index += (window_size - window_overlap)
+
+##################################################
+#%% Calculating Features
+##################################################
+features_df = []
+for wd in range(len(emg_windowed)):
+    new_df = pd.DataFrame(columns=['rms', 'zc', 'mav', 'var', 'wl', 'ssc', 'contraction', 'output'])
+    get_features(emg_windowed[wd],
+            features_list = ['rms', 'zc', 'mav', 'var', 'wl', 'ssc'],
+            output_obj = new_df):
+    new_df['contraction'] = 1
+    new_df['output'] = windows_out_signal[wd]
+    features_df.append(new_df)
+
+##################################################
+#%% Writing Dataframe to file
+##################################################
+processed_database = pd.concat(features_df)
+print("Writing new dataframe to file..")
+file_name_output = 'datasets/volunteer_'+str(volunteer_id_number)+'_processed.csv'
+processed_database.to_csv(path_or_buf=file_name_output,header=True)
+print('*'*30)
