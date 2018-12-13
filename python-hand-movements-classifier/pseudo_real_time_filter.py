@@ -9,8 +9,10 @@ from scipy import signal
 
 def do_moving_average(raw_signal, window_size):
     wd = np.ones(window_size)
-    mva_signal = np.convolve(raw_signal, wd, mode='same') / window_size
-    return mva_signal
+    mva_signal = np.convolve(raw_signal, wd, mode='valid') / window_size
+    signal_with_delay = np.zeros(window_size - 1)
+    signal_with_delay = np.append(signal_with_delay, mva_signal)
+    return signal_with_delay
 
 def do_high_pass_mva(raw_signal, window_size):
     filtered_signal = raw_signal - do_moving_average(raw_signal, window_size)
