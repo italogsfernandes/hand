@@ -19,7 +19,30 @@ emg_channels = dataset.iloc[:, 1:-1].values
 emg_out = dataset.iloc[:, -1].values
 
 dataset = None
+###############################
+#%% Optional: Plotting the data
+###############################
 
+# Here we use the matplotlib library to plot a small window of the signal
+# And verify if everything is all right
+'''
+fig = plt.figure()
+axes = [None for i in range(4)]
+for i in range(4):
+    axes[i] = plt.subplot(4,1,i+1)
+    plt.plot(emg_channels[:,i])
+    plt.plot(emg_out[:]/10.0)
+    plt.title('Ch ' + str(i+1))
+    plt.ylim((-1,1))
+    plt.grid()
+
+axes[0].get_shared_x_axes().join(axes[0],axes[1],axes[2],axes[3])
+axes[0].get_shared_y_axes().join(axes[0],axes[1],axes[2],axes[3])
+axes[0].set_xticklabels([])
+axes[1].set_xticklabels([])
+axes[2].set_xticklabels([])
+plt.show()
+'''
 #########################
 #%% Pre-processing simulating real time implementation
 #########################
@@ -64,12 +87,27 @@ for ch in range(4):
     emg_pre_processed[:, ch] = emg_offset_60hz
     emg_envelope[:, ch] = emg_offset_60hz_envelope
 
-threshould = np.array([0.005, 0.005, 0.005, 0.005])
+#########################
+#%% Contraction Sites
+#########################
+threshould = np.array([0.01, 0.01, 0.01, 0.01])
+
+emg_contractions = np.zeros(shape=emg_envelope.shape, dtype=np.int8)
+geral_contractions = np.zeros(len(emg_envelope), dtype=np.int8)
+
+for ch in range(4):
+    emg_contractions[:,ch] = emg_envelope[:,ch] > threshould[ch]
+    geral_contractions += emg_contractions[:,ch]
+
+#geral_contractions = do_moving_average(geral_contractions,200)
+geral_contractions = (geral_contractions > 0).astype(np.int8)
 
 ################################
 #%% plotting_signal_envelope
 ################################
+'''
 ax1 = plt.subplot(4,1,1)
+plt.plot(emg_pre_processed[:,0])
 plt.plot(emg_envelope[:,0])
 plt.title("CH1")
 ax2 = plt.subplot(4,1,2)
@@ -89,33 +127,42 @@ ax1.get_shared_x_axes().join(ax1, ax2, ax3, ax4)
 ax1.get_shared_y_axes().join(ax1, ax2, ax3, ax4)
 plt.tight_layout()
 plt.show()
-
+'''
 ################################
 #%% plotting only envelope
 ################################
+'''
 N = len(emg_envelope)
 ax1 = plt.subplot(4,1,1)
 plt.plot(emg_envelope[:,0])
 plt.plot(np.ones(N)*threshould[0])
+plt.plot(geral_contractions)
+plt.plot(emg_out/10)
 plt.title("CH1 - th: %.4f" % (threshould[0]))
 ax2 = plt.subplot(4,1,2)
 plt.plot(emg_envelope[:,1])
 plt.plot(np.ones(N)*threshould[1])
+plt.plot(geral_contractions)
+plt.plot(emg_out/10)
 plt.title("CH2 - th: %.4f" % (threshould[1]))
 ax3 = plt.subplot(4,1,3)
 plt.plot(emg_envelope[:,2])
 plt.plot(np.ones(N)*threshould[2])
+plt.plot(geral_contractions)
+plt.plot(emg_out/10)
 plt.title("CH3 - th: %.4f" % (threshould[2]))
 ax4 = plt.subplot(4,1,4)
 plt.plot(emg_envelope[:,3])
 plt.plot(np.ones(N)*threshould[3])
+plt.plot(geral_contractions)
+plt.plot(emg_out/10)
 plt.title("CH4 - th: %.4f" % (threshould[3]))
 
 ax1.get_shared_x_axes().join(ax1, ax2, ax3, ax4)
 ax1.get_shared_y_axes().join(ax1, ax2, ax3, ax4)
 plt.tight_layout()
 plt.show()
-
+'''
 ################################
 #%% super plot
 ################################
@@ -155,36 +202,11 @@ plt.show()
 '''
 
 #########################
-#%% Contraction Sites
-#########################
-
-
-#########################
-#%% Windowing
+#%% Windowing without considering contractions
 #########################
 #TODO
 
-
-###############################
-#%% Optional: Plotting the data
-###############################
-
-# Here we use the matplotlib library to plot a small window of the signal
-# And verify if everything is all right
-
-fig = plt.figure()
-axes = [None for i in range(4)]
-for i in range(4):
-    axes[i] = plt.subplot(4,1,i+1)
-    plt.plot(emg_channels[:,i])
-    plt.plot(emg_out[:]/10.0)
-    plt.title('Ch ' + str(i+1))
-    plt.ylim((-1,1))
-    plt.grid()
-
-axes[0].get_shared_x_axes().join(axes[0],axes[1],axes[2],axes[3])
-axes[0].get_shared_y_axes().join(axes[0],axes[1],axes[2],axes[3])
-axes[0].set_xticklabels([])
-axes[1].set_xticklabels([])
-axes[2].set_xticklabels([])
-plt.show()
+#########################
+#%% Windowing without considering contractions
+#########################
+#TODO
