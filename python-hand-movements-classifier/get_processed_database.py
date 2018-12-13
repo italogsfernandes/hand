@@ -53,21 +53,47 @@ print("Total atraso: %.3f s" % ((1/Fs) * (Nhp+Nlp+N55hz+N65hz)))
 #%% Applyting filters
 #########################
 
-emg = emg_channels[:,0]
+emg_pre_processed = np.zeros(emg_channels.shape)
+emg_envelope = np.zeros(emg_channels.shape)
 
-emg_60hz = do_band_stop_mva(emg, N55hz, N65hz)
-emg_60hz_offset = do_high_pass_mva(emg_60hz, Nhp)
-emg_60hz_offset_envelope = do_moving_average(np.abs(emg_60hz_offset), Nhp)
+for ch in range(4):
+    emg = emg_channels[:,ch]
+    emg_offset = do_high_pass_mva(emg, Nhp)
+    emg_offset_60hz = do_band_stop_mva(emg_offset, N55hz, N65hz)
+    emg_offset_60hz_envelope = do_moving_average(np.abs(emg_offset_60hz), Nhp)
+    emg_pre_processed[:, ch] = emg_offset_60hz
+    emg_envelope[:, ch] = emg_offset_60hz_envelope
 
-emg_offset = do_high_pass_mva(emg, Nhp)
-emg_offset_60hz = do_band_stop_mva(emg_offset, N55hz, N65hz)
-emg_offset_60hz_envelope = do_moving_average(np.abs(emg_offset_60hz), Nhp)
+################################
+#%% plotting_signal_envelope
+################################
+ax1 = plt.subplot(4,1,1)
+plt.plot(emg_pre_processed[:,0])
+plt.plot(emg_envelope[:,0])
+plt.title("CH1")
+ax2 = plt.subplot(4,1,2)
+plt.plot(emg_pre_processed[:,1])
+plt.plot(emg_envelope[:,1])
+plt.title("CH2")
+ax3 = plt.subplot(4,1,3)
+plt.plot(emg_pre_processed[:,2])
+plt.plot(emg_envelope[:,2])
+plt.title("CH3")
+ax4 = plt.subplot(4,1,4)
+plt.plot(emg_pre_processed[:,3])
+plt.plot(emg_envelope[:,3])
+plt.title("CH4")
 
-emg_60hz_envelope = do_moving_average(np.abs(emg_60hz), Nhp)
+ax1.get_shared_x_axes().join(ax1, ax2, ax3, ax4)
+ax1.get_shared_y_axes().join(ax1, ax2, ax3, ax4)
+plt.tight_layout()
+plt.show()
+
 
 ################################
 #%% super plot
 ################################
+'''
 ax1 = plt.subplot(4,2,1)
 plt.plot(emg)
 #plt.plot(emg_60hz_offset)
@@ -100,7 +126,7 @@ ax1.get_shared_x_axes().join(ax1, ax2, ax3, ax4, ax11, ax12, ax13, ax14)
 ax1.get_shared_y_axes().join(ax1, ax2, ax3, ax11, ax12, ax13)
 plt.tight_layout()
 plt.show()
-
+'''
 #########################
 #%% Windowing
 #########################
