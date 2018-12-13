@@ -76,7 +76,7 @@ class ArduinoHandler:
         self.serialPort.port = port_name
         self.serialPort.baudrate = baudrate
         self.thread_acquisition = ThreadHandler(self.acquire_routine, self.close)
-        self.buffer_acquisition = Queue(1024)
+        self.buffer_acquisition = Queue(1024*4)
 
     def update_port_name(self):
         self.serial_tools_obj = None
