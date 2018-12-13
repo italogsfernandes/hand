@@ -41,7 +41,6 @@ HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "F
 #       - python-hand_moviments-classifier
 #           - app_procedimentos
 #               - app_procedures.py
-file_name = 'datasets/coletas/Eber/Eber11-Final.txt'
 
 # Opening a file and reading it to a dataFrame object
 # sep means separator, the files have no headers
