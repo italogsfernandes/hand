@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu May 17 16:06:46 2018
-
+Coding at 6:48 and listening to:
+    Rock is Dead - Marylin Manson
+    Dance D'Amour - The 69 Eyes
+    Wake Up - Rage Against the Machine
+    Clubbed to Death - Robert D.
 @author: italo
 """
 #%% Importing the libraries
@@ -25,7 +28,6 @@ from scipy import signal
 # 6 -> Flexionar
 # This should be the output of the classifier. It should classify each moviment
 # in one of this classes.
-HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "Flexionar"]
 
 #########################
 #%% Importing the dataset
@@ -48,29 +50,48 @@ HAND_MOVIMENTS_NAMES = ["Supinar", "Pronar", "Pinçar", "Fechar", "Estender", "F
 # At end, we select the 4 channels as a numpy vector and we save it in
 # emg_channels.
 # The trigger is saved in emg_trigger.
-volunteer_id = 'Eber/Eber'
+volunteer_id = 'Insira aqui'
+volunteer_id_number = 1
+print("Opening files of volunteer %d - %s" % (volunteer_id_number, volunteer_id))
+
+print("Opening part 1.1...")
 dataset_pt11 = pd.read_table('datasets/coletas/'+volunteer_id+'11-Final.txt', sep=';', header=None)
 dataset_pt11.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
+
+print("Opening part 1.2...")
 dataset_pt12 = pd.read_table('datasets/coletas/'+volunteer_id+'12-Final.txt', sep=';', header=None)
 dataset_pt12.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
+
+print("Opening part 1.3...")
 dataset_pt13 = pd.read_table('datasets/coletas/'+volunteer_id+'13-Final.txt', sep=';', header=None)
 dataset_pt13.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
+
+print("Opening part 1.4...")
 dataset_pt14 = pd.read_table('datasets/coletas/'+volunteer_id+'14-Final.txt', sep=';', header=None)
 dataset_pt14.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
 
+
+print("Opening part 2.1...")
 dataset_pt21 = pd.read_table('datasets/coletas/'+volunteer_id+'21-Final.txt', sep=';', header=None)
 dataset_pt21.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
+
+print("Opening part 2.2...")
 dataset_pt22 = pd.read_table('datasets/coletas/'+volunteer_id+'22-Final.txt', sep=';', header=None)
 dataset_pt22.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
+
+print("Opening part 2.3...")
 dataset_pt23 = pd.read_table('datasets/coletas/'+volunteer_id+'23-Final.txt', sep=';', header=None)
 dataset_pt23.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
+
+
+print("Opening part 2.4...")
 dataset_pt24 = pd.read_table('datasets/coletas/'+volunteer_id+'24-Final.txt', sep=';', header=None)
 dataset_pt24.columns = 'CH1 CH2 CH3 CH4 Trigger None'.split()
 
+print('*'*30)
 dt_frames = [dataset_pt11, dataset_pt12, dataset_pt13, dataset_pt14,
           dataset_pt21, dataset_pt22, dataset_pt23, dataset_pt24]
 dataset = pd.concat(dt_frames)
-
 
 emg_channels = dataset.iloc[:, :-2].values
 emg_trigger = dataset.iloc[:, -2].values
@@ -89,6 +110,7 @@ dataset = None
 # executed in each peek of the trigger.
 # targets contains the moviments as a number from 1 to 6
 # and targets_str as a string(name)
+print("Reading targets...")
 targets_pt11 = pd.read_table('datasets/coletas/'+volunteer_id+'11-Resposta.txt', header=None)
 targets_pt12 = pd.read_table('datasets/coletas/'+volunteer_id+'12-Resposta.txt', header=None)
 targets_pt13 = pd.read_table('datasets/coletas/'+volunteer_id+'13-Resposta.txt', header=None)
@@ -115,9 +137,7 @@ targets_pt24 = None
 targets_frames = None
 
 targets = targets.iloc[:, :].values.ravel()
-targets_str = []
-for target in targets:
-    targets_str.append(HAND_MOVIMENTS_NAMES[target-1])
+print('*'*30)
 
 #####################
 #%% Signal constants
@@ -154,27 +174,32 @@ fs = 2000  # Sampling frequency in Hz
 # objectiving to deslocate the signal
 # We also exclude the last 'delay_trigger' points of the signal
 # to garant that the new array will have the same size of the emg_trigger
+print("Correcting Trigger...")
 emg_trigger_corrected = np.append(arr = np.zeros(delay_trigger),
                                   values = emg_trigger[:-delay_trigger])
-
+print('*'*30)
 ###########################
 #%% downsampling to 1000Hz
 ###########################
+print("downsampling...")
 emg_channels = emg_channels[range(0,len(emg_channels),2),:]
 emg_trigger = emg_trigger[range(0,len(emg_trigger),2)]
 emg_trigger_corrected = emg_trigger_corrected[range(0,len(emg_trigger_corrected),2)]
-
+print('*'*30)
 ###########################
 #%% Normalizing
 ###########################
+print("Normalizing")
 maximum = max([abs(emg_channels.max()), abs(emg_channels.min())])
 emg_channels = emg_channels / maximum
 emg_trigger = np.array(emg_trigger > 0.7, dtype=np.uint8)
 emg_trigger_corrected = np.array(emg_trigger_corrected > 0.7, dtype=np.uint8)
+print('*'*30)
 
 #####################
 #%% Contraction sites
 #####################
+print("Calculating Contraction Sites")
 s3= np.array(emg_trigger_corrected, dtype=np.int8)
 s3[s3==0] = -1     # replace zeros with -1
 s4=np.where(np.diff(s3))[0]+1
@@ -182,29 +207,34 @@ contractions_onsets = s4[np.arange(0,len(s4),2)]
 contractions_offsets = s4[np.arange(1,len(s4),2)]
 s3 = None
 s4 = None
+print('*'*30)
 ###############################
 #%% OUPUT SIGNAL
 ###############################
+print("Generating output signal...")
 output_signal = emg_trigger_corrected
 contractions_lenght = contractions_offsets - contractions_onsets
 for n in range(len(contractions_onsets)):
     cont_index = np.arange(contractions_onsets[n],contractions_offsets[n])
     cont_values = targets[n] * np.ones(contractions_lenght[n])
     output_signal[cont_index] = cont_values
-
+print('*'*30)
 ###############################
 #%% creating new file
 ###############################
+print("Creating new dataframe...")
 output_data_frame = pd.DataFrame(columns=['CH1', 'CH2', 'CH3', 'CH4', 'OUTPUT'])
-
 output_data_frame['CH1'] = emg_channels[:,0]
 output_data_frame['CH2'] = emg_channels[:,1]
 output_data_frame['CH3'] = emg_channels[:,2]
 output_data_frame['CH4'] = emg_channels[:,3]
 output_data_frame['OUTPUT'] = output_signal
+print('*'*30)
 
-file_name_output = 'datasets/volunteer_1.csv'
+print("Writing new dataframe to file..")
+file_name_output = 'datasets/volunteer_'+str(volunteer_id_number)+'.csv'
 output_data_frame.to_csv(path_or_buf=file_name_output,header=True)
+print('*'*30)
 
 # TODO: add SQLAlchemy support
 
@@ -214,8 +244,11 @@ output_data_frame.to_csv(path_or_buf=file_name_output,header=True)
 
 # Here we use the matplotlib library to plot a small window of the signal
 # And verify if everything is all right
-
+print("Done!")
+print("Now plotting!")
+print(":)")
 fig = plt.figure()
+fig.suptitle("Voluntario: " + str(volunteer_id_number))
 axes = [None for i in range(4)]
 for i in range(4):
     axes[i] = plt.subplot(4,1,i+1)
