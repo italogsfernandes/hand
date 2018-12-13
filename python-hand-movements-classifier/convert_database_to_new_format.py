@@ -175,16 +175,13 @@ emg_trigger_corrected = np.array(emg_trigger_corrected > 0.7, dtype=np.uint8)
 #####################
 #%% Contraction sites
 #####################
-np.where(np.diff(np.sign(np.diff(
-                emg_trigger_corrected
-                ))))[0]
-
 s3= np.array(emg_trigger_corrected, dtype=np.int8)
 s3[s3==0] = -1     # replace zeros with -1
 s4=np.where(np.diff(s3))[0]+1
 contractions_onsets = s4[np.arange(0,len(s4),2)]
 contractions_offsets = s4[np.arange(1,len(s4),2)]
-
+s3 = None
+s4 = None
 ###############################
 #%% OUPUT SIGNAL
 ###############################
