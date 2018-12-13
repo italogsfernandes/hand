@@ -19,6 +19,20 @@ emg_channels = dataset.iloc[:, 1:-1].values
 emg_out = dataset.iloc[:, -1].values
 
 dataset = None
+
+#####################
+#%% Contraction sites
+#####################
+print("Calculating Contraction Sites")
+s3= np.array(geral_contractions, dtype=np.int8)
+s3[s3==0] = -1     # replace zeros with -1
+s4=np.where(np.diff(s3))[0]+1
+contractions_onsets = s4[np.arange(0,len(s4),2)]
+contractions_offsets = s4[np.arange(1,len(s4),2)]
+s3 = None
+s4 = None
+print('*'*30)
+
 ###############################
 #%% Optional: Plotting the data
 ###############################
@@ -101,7 +115,7 @@ for ch in range(4):
 
 #geral_contractions = do_moving_average(geral_contractions,200)
 geral_contractions = (geral_contractions > 0).astype(np.int8)
-
+geral_contractions = emg_out
 ################################
 #%% plotting_signal_envelope
 ################################
@@ -207,6 +221,20 @@ plt.show()
 #TODO
 
 #########################
-#%% Windowing without considering contractions
+#%% Windowing considering contractions
 #########################
-#TODO
+emg_windowed = []
+windows_out_signal = []
+
+window_size = 200
+window_overlap = 20
+
+for contraction_n in range(len(contractions_onsets)):
+    start_index = contractions_onsets[contraction_n]
+    current_index = start_index
+    end_index = contractions_offsets[contraction_n]
+    while current_index < end_index:
+        this_window = emg_pre_processed[current_index:current_index+window_size]
+        emg_windowed.append(this_window)
+        windows_out_signal.append(geral_contractions[current_index])
+        current_index += (window_size - window_overlap)
