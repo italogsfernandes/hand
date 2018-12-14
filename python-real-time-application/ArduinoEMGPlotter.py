@@ -348,7 +348,11 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
             self.ch2_features_window[self.features_window_index] = self.emg_values[1]
             self.ch3_features_window[self.features_window_index] = self.emg_values[2]
             self.ch4_features_window[self.features_window_index] = self.emg_values[3]
-
+            #
+            # 0 1 2 3 4 5 6 7 8 9 10
+            # 0 1 2 3 4
+            #         4 5 6 7
+            #               7 8 9 1
             # incrementing index
             self.features_window_index = self.features_window_index + 1
             if self.features_window_index >= self.features_window_size:

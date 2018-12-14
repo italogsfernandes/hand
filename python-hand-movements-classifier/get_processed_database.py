@@ -120,6 +120,17 @@ geral_contractions = emg_out
 #%% plotting_signal_envelope
 ################################
 '''
+emg = emg_channels[:,0]
+emg_60hz = do_band_stop_mva(emg, N55hz, N65hz)
+emg_60hz_offset = do_high_pass_mva(emg_60hz, Nhp)
+emg_60hz_offset_envelope = do_moving_average(np.abs(emg_60hz_offset), 500)
+emg_offset = do_high_pass_mva(emg, Nhp)
+emg_offset_60hz = do_band_stop_mva(emg_offset, N55hz, N65hz)
+emg_offset_60hz_envelope = do_moving_average(np.abs(emg_offset_60hz), 500)
+emg_60hz_envelope = do_moving_average(np.abs(emg_60hz), Nhp)
+'''
+
+'''
 ax1 = plt.subplot(4,1,1)
 plt.plot(emg_pre_processed[:,0])
 plt.plot(emg_envelope[:,0])
