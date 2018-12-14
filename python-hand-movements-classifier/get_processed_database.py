@@ -6,6 +6,8 @@ import pandas as pd # reading files
 import numpy as np # handling numerical data
 import matplotlib.pyplot as plt # Plotting
 from scipy import signal
+import sys
+sys.path.append('python-hand-movements-classifier')
 from pseudo_real_time_filter import *
 from feature_extractor import *
 #########################
@@ -20,19 +22,6 @@ emg_channels = dataset.iloc[:, 1:-1].values
 emg_out = dataset.iloc[:, -1].values
 
 dataset = None
-
-#####################
-#%% Contraction sites
-#####################
-print("Calculating Contraction Sites")
-s3= np.array(geral_contractions, dtype=np.int8)
-s3[s3==0] = -1     # replace zeros with -1
-s4=np.where(np.diff(s3))[0]+1
-contractions_onsets = s4[np.arange(0,len(s4),2)]
-contractions_offsets = s4[np.arange(1,len(s4),2)]
-s3 = None
-s4 = None
-print('*'*30)
 
 ###############################
 #%% Optional: Plotting the data
@@ -116,7 +105,20 @@ for ch in range(4):
 
 #geral_contractions = do_moving_average(geral_contractions,200)
 geral_contractions = (geral_contractions > 0).astype(np.int8)
-geral_contractions = emg_out
+#geral_contractions = emg_out
+
+#####################
+#%% Contraction sites
+#####################
+print("Calculating Contraction Sites")
+s3= np.array(emg_out, dtype=np.int8)
+s3[s3==0] = -1     # replace zeros with -1
+s4=np.where(np.diff(s3))[0]+1
+contractions_onsets = s4[np.arange(0,len(s4),2)]
+contractions_offsets = s4[np.arange(1,len(s4),2)]
+s3 = None
+s4 = None
+print('*'*30)
 ################################
 #%% plotting_signal_envelope
 ################################
@@ -239,34 +241,87 @@ emg_windowed = []
 windows_out_signal = []
 
 window_size = 200
-window_overlap = 20
+contractions_onsets = contractions_onsets + 400
+contractions_offsets = contractions_offsets + 400
+for contraction_n in range(len(contractions_onsets)):
+    start_index = contractions_onsets[contraction_n]
+    end_index = contractions_offsets[contraction_n]
+    this_window = emg_pre_processed[start_index:start_index+window_size]
+    emg_windowed.append(this_window)
+    windows_out_signal.append(emg_out[start_index])
+
+
+all_index_windows = np.array([])
 
 for contraction_n in range(len(contractions_onsets)):
     start_index = contractions_onsets[contraction_n]
-    current_index = start_index
     end_index = contractions_offsets[contraction_n]
-    while current_index < end_index:
-        this_window = emg_pre_processed[current_index:current_index+window_size]
-        emg_windowed.append(this_window)
-        windows_out_signal.append(geral_contractions[current_index])
-        current_index += (window_size - window_overlap)
+    all_index_windows = np.append(all_index_windows, np.arange(start_index, start_index+window_size))
+
+all_emg_windows = np.array([])
+for n in range(len(emg_windowed)):
+    all_emg_windows = np.append(all_emg_windows, emg_windowed[n][:,0])
+
+ax1 = plt.subplot(2,1,1)
+plt.plot(emg_pre_processed[:,0])
+ax2 = plt.subplot(2,1,2)
+plt.plot(emg_pre_processed[:,0])
+plt.plot(all_index_windows, all_emg_windows)
+
+ax1.get_shared_x_axes().join(ax1, ax2)
+ax1.get_shared_y_axes().join(ax1, ax2)
+plt.tight_layout()
+plt.show()
 
 ##################################################
 #%% Calculating Features
 ##################################################
 features_df = []
 for wd in range(len(emg_windowed)):
-    new_df = pd.DataFrame(columns=['rms', 'zc', 'mav', 'var', 'wl', 'ssc', 'contraction', 'output'])
-    get_features(emg_windowed[wd],
-            features_list = ['rms', 'zc', 'mav', 'var', 'wl', 'ssc'],
-            output_obj = new_df):
-    new_df['contraction'] = 1
-    new_df['output'] = windows_out_signal[wd]
+    ch0_features = get_features(emg_windowed[wd][:,0]);
+    ch1_features = get_features(emg_windowed[wd][:,1]);
+    ch2_features = get_features(emg_windowed[wd][:,2]);
+    ch3_features = get_features(emg_windowed[wd][:,3]);
+    new_df = pd.DataFrame(np.zeros((1,4*6+2)),
+    columns=['rms0','rms1','rms2','rms3', 'zc0', 'zc1', 'zc2', 'zc3', 'mav0', 'mav1', 'mav2', 'mav3', 'var0', 'var1', 'var2', 'var3', 'wl0', 'wl1', 'wl2', 'wl3', 'ssc0', 'ssc1', 'ssc2', 'ssc3', 'contraction', 'output'])
+    print("desgraça")
+    #ch0
+    new_df['rms0'][0] = (ch0_features['rms'])
+    new_df['zc0'][0] = (ch0_features['zc'])
+    new_df['mav0'][0] = (ch0_features['mav'])
+    new_df['var0'][0] = (ch0_features['var'])
+    new_df['wl0'][0] = (ch0_features['wl'])
+    new_df['ssc0'][0] = (ch0_features['ssc'])
+    #ch1
+    new_df['rms1'][0] = (ch1_features['rms'])
+    new_df['zc1'][0] = (ch1_features['zc'])
+    new_df['mav1'][0] = (ch1_features['mav'])
+    new_df['var1'][0] = (ch1_features['var'])
+    new_df['wl1'][0] = (ch1_features['wl'])
+    new_df['ssc1'][0] = (ch1_features['ssc'])
+    #ch2
+    new_df['rms2'][0] = (ch2_features['rms'])
+    new_df['zc2'][0] = (ch2_features['zc'])
+    new_df['mav2'][0] = (ch2_features['mav'])
+    new_df['var2'][0] = (ch2_features['var'])
+    new_df['wl2'][0] = (ch2_features['wl'])
+    new_df['ssc2'][0] = (ch2_features['ssc'])
+    #ch3
+    new_df['rms3'][0] = (ch3_features['rms'])
+    new_df['zc3'][0] = (ch3_features['zc'])
+    new_df['mav3'][0] = (ch3_features['mav'])
+    new_df['var3'][0] = (ch3_features['var'])
+    new_df['wl3'][0] = (ch3_features['wl'])
+    new_df['ssc3'][0] = (ch3_features['ssc'])
+    #new_df['contraction'] = 1
+    #new_df['output'] = windows_out_signal[wd]
     features_df.append(new_df)
+
 
 ##################################################
 #%% Writing Dataframe to file
 ##################################################
+volunteer_id_number = 1
 processed_database = pd.concat(features_df)
 print("Writing new dataframe to file..")
 file_name_output = 'datasets/volunteer_'+str(volunteer_id_number)+'_processed.csv'

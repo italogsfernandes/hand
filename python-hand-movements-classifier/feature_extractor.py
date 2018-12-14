@@ -32,6 +32,7 @@
 #        ssc_ = np.where(ssc_)[0].shape[0]
 
 import numpy as np # handling numerical data
+import pandas as pd
 
 def get_features(input_array,
         features_list = ['RMS', 'ZC', 'MAV', 'VAR', 'WL', 'SSC'],
@@ -66,6 +67,60 @@ def get_features(input_array,
     """
 
     features_list = [f.lower() for f in features_list]
+
+    if 'rms' in features_list:
+        output_obj['rms'] = get_rms(input_array)
+
+    if 'zc' in features_list:
+        output_obj['zc'] = get_zc(input_array)
+
+    if 'mav' in features_list:
+        output_obj['mav'] = get_mav(input_array)
+
+    if 'var' in features_list:
+        output_obj['var'] = get_var(input_array)
+
+    if 'wl' in features_list:
+        output_obj['wl'] = get_wl(input_array)
+
+    if 'ssc' in features_list:
+        output_obj['ssc'] = get_ssc(input_array)
+
+    return output_obj
+
+def get_features_DataFrame(input_array,
+        features_list = ['RMS', 'ZC', 'MAV', 'VAR', 'WL', 'SSC']):
+    """Get all the features listed in the features list
+    Features list made using as reference:
+        Nazmi N, Abdul Rahman MA, Yamamoto S-I, Ahmad SA, Zamzuri H, Mazlan SA.
+        A Review of Classification Techniques of EMG Signals during Isotonic and
+        Isometric Contractions. Postolache OA, Casson A, Mukhopadhyay S, eds.
+        Sensors (Basel, Switzerland). 2016;16(8):1304. doi:10.3390/s16081304.
+
+    Parameters
+    ----------
+    input_array : type
+        Description of parameter `input_array`.
+    features_list : list
+        Available features:
+            * 'RMS' : Root Mean Square
+            * 'ZC'  : Zero Crossing
+            * 'MAV' : Mean Absolute Value
+            * 'VAR' : Variance
+            * 'WL'  : Wave Length
+            * 'SSC' : Slope Signal Change
+        Default value setted to all available features
+    output_obj : type of object to be returned
+        suggestion -> you can utilze pandas dataFrame
+                for improve performance in some cases
+    Returns
+    -------
+    dict
+        dict with an key for each feature (in lowercase)
+    """
+
+    features_list = [f.lower() for f in features_list]
+    output_obj = pd.DataFrame(columns=features_list)
 
     if 'rms' in features_list:
         output_obj['rms'] = get_rms(input_array)
