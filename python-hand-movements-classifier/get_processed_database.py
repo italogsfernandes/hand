@@ -14,9 +14,9 @@ from feature_extractor import *
 #%% Importing the dataset
 #########################
 
-volunteer_id = 1
-dataset = pd.read_csv('datasets/volunteer_'+str(volunteer_id)+'.csv', sep=',',
- nrows=150000)
+volunteer_id = 6
+dataset = pd.read_csv('datasets/volunteer_'+str(volunteer_id)+'.csv', sep=',')#,
+# nrows=150000)
 
 emg_channels = dataset.iloc[:, 1:-1].values
 emg_out = dataset.iloc[:, -1].values
@@ -262,6 +262,7 @@ all_emg_windows = np.array([])
 for n in range(len(emg_windowed)):
     all_emg_windows = np.append(all_emg_windows, emg_windowed[n][:,0])
 
+'''
 ax1 = plt.subplot(2,1,1)
 plt.plot(emg_pre_processed[:,0])
 ax2 = plt.subplot(2,1,2)
@@ -272,7 +273,7 @@ ax1.get_shared_x_axes().join(ax1, ax2)
 ax1.get_shared_y_axes().join(ax1, ax2)
 plt.tight_layout()
 plt.show()
-
+'''
 ##################################################
 #%% Calculating Features
 ##################################################
@@ -313,17 +314,16 @@ for wd in range(len(emg_windowed)):
     new_df['var3'][0] = (ch3_features['var'])
     new_df['wl3'][0] = (ch3_features['wl'])
     new_df['ssc3'][0] = (ch3_features['ssc'])
-    #new_df['contraction'] = 1
-    #new_df['output'] = windows_out_signal[wd]
+    new_df['contraction'] = 1
+    new_df['output'] = windows_out_signal[wd]
     features_df.append(new_df)
 
 
 ##################################################
 #%% Writing Dataframe to file
 ##################################################
-volunteer_id_number = 1
 processed_database = pd.concat(features_df)
 print("Writing new dataframe to file..")
-file_name_output = 'datasets/volunteer_'+str(volunteer_id_number)+'_processed.csv'
+file_name_output = 'datasets/volunteer_'+str(volunteer_id)+'_processed.csv'
 processed_database.to_csv(path_or_buf=file_name_output,header=True)
 print('*'*30)
