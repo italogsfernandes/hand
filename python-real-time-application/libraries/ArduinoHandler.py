@@ -217,7 +217,7 @@ class ArduinoHandler:
         :param separator: Separates the strings, example ' - ', ' | ', '\n'
         :return: A string containing the status of all the buffers involved in the acquisition
         """
-        return "Serial: %4d" % (self.serialPort.inWaiting()/4 if self.serialPort.isOpen() else 0) + '/' + str(4096/4) +\
+        return "Serial: %4d" % (self.serialPort.inWaiting()/4 if self.serialPort.isOpen() else 0) + '/' + str(4096) +\
                separator + "Acq: %4d" % (self.buffer_acquisition.qsize()) + '/' + str(self.buffer_acquisition.maxsize)
 
 
