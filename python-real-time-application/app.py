@@ -13,6 +13,8 @@
 from ArduinoEMGPlotter import ArduinoEMGPlotter
 
 import sys
+
+# Including Libraries according to python version
 if sys.version_info.major == 3:
     # PyQt5
     from PyQt5.QtWidgets import *
@@ -25,9 +27,11 @@ elif sys.version_info.major == 2:
     from PyQt4 import QtCore
     from PyQt4.QtCore import SIGNAL
 else:
-    print("Versao do python nao suportada")
-# ------------------------------------------------------------------------------
+    print("Python version not supported.")
 
+# ------------------------------------------------------------------------------
+# MAIN CLASS
+# ------------------------------------------------------------------------------
 class HandProjectApp(QMainWindow, base.Ui_MainWindow):
     def __init__(self, parent=None):
         super(self.__class__, self).__init__(parent)
@@ -102,6 +106,9 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.tabWidget.currentChanged.connect(self.tab_changed)
 
     def tab_changed(self, tab_index):
+        """ For every change in the visible tab, it disables the unused threads.
+        And it enables the threads corresponding to the visible information.
+        """
         if tab_index == 0:
             self.emg_app.plotHandler.enable()
             print("enabled")
@@ -109,7 +116,6 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
             self.emg_app.plotHandler.disable()
             print("disabled")
 
-        print(tab_index)
         if tab_index == 1:
             self.emg_app.feature_plot_handler.enable()
             print("enabled")
@@ -119,27 +125,38 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
 
 
     def find_serial_port(self):
+        """ Try to find a active serial port.
+        """
         bar_foo = self.emg_app.arduinoHandler.update_port_name()
         self.statusbar.showMessage(bar_foo)
         self.lbl_status.setText(bar_foo)
 
     def turn_chart_emg_on_off(self, cb_value):
+        """ Enables and disables the emg chart.
+        """
         if self.emg_app.plotHandler.is_enabled:
             self.emg_app.plotHandler.disable()
         else:
             self.emg_app.plotHandler.enable()
 
     def turn_chart_features_on_off(self, cb_value):
+        """ Enables and disables the features chart.
+        """
         if self.emg_app.feature_plot_handler.is_enabled:
             self.emg_app.feature_plot_handler.disable()
         else:
             self.emg_app.feature_plot_handler.enable()
 
     def closeEvent(self, q_close_event):
+        """ Method called when the application is being closed.
+        Closes the serial port before closing application.
+        """
         self.emg_app.stop()
         super(self.__class__, self).closeEvent(q_close_event)
 
     def start_stop_acquisition(self):
+        """ toggle the acquision.
+        """
         if not self.emg_app.started:
             try:
                 self.emg_app.start()
@@ -149,6 +166,7 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         else:
             self.emg_app.stop()
             self.actionStartAcquisition.setText("Start Acquisition")
+
 # ------------------------------------------------------------------------------
 def main():
     """Main function
