@@ -36,7 +36,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_EMG">
        <attribute name="title">
@@ -275,6 +275,9 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <layout class="QVBoxLayout" name="verticalLayoutOptions">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QLabel" name="lbl_options">
          <property name="sizePolicy">
@@ -289,49 +292,116 @@
            <height>50</height>
           </size>
          </property>
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+           <strikeout>false</strikeout>
+           <kerning>true</kerning>
+          </font>
+         </property>
          <property name="text">
-          <string>Options:</string>
+          <string>Options</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayoutThreshould">
          <item>
-          <widget class="QLabel" name="lbl_status_opt">
-           <property name="text">
-            <string>Status:</string>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>Training</string>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QPushButton" name="btn_record_raw_emg">
+              <property name="text">
+               <string>Record raw EMG file</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_file_name">
+              <property name="text">
+               <string>File: None</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="lbl_output_name">
+                <property name="text">
+                 <string>Output:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lbl_output_value">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>None</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_acquiring_status">
-           <property name="text">
-            <string>Acquiring: Off</string>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>Status</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_plotting_status">
-           <property name="text">
-            <string>Plotting: Off</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_processing_status">
-           <property name="text">
-            <string>Processing: Off</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_classification_status">
-           <property name="text">
-            <string>Classification: Off</string>
-           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_acquiring_status">
+              <property name="text">
+               <string>Acquiring: Off</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_plotting_status">
+              <property name="text">
+               <string>Plotting: Off</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_processing_status">
+              <property name="text">
+               <string>Processing: Off</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_classification_status">
+              <property name="text">
+               <string>Classification: Off</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item>
