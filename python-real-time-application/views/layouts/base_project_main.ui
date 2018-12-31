@@ -344,9 +344,19 @@
                </widget>
               </item>
               <item>
+               <widget class="QPlainTextEdit" name="txt_output_press">
+                <property name="maximumSize">
+                 <size>
+                  <width>800</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="lbl_output_value">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
