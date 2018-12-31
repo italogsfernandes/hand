@@ -107,6 +107,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
 
         self.saving_to_file = False
         self.file_obj = None
+        self.move_output_value = 0
 
         #################################################
         #NOTE: Put it in another place, only for testing:
@@ -341,7 +342,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                                   str(self.emg_values[1]) + "," +\
                                   str(self.emg_values[2]) + "," +\
                                   str(self.emg_values[3]) + "," +\
-                                  str(self.output_value))
+                                  str(self.move_output_value))
             else:
                 ####################################################
                 # Creating windows for pre processing
