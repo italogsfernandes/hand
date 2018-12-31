@@ -13,6 +13,7 @@
 from ArduinoEMGPlotter import ArduinoEMGPlotter
 
 import sys
+import os
 
 # Including Libraries according to python version
 if sys.version_info.major == 3:
@@ -114,11 +115,18 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         2. Acquisition should be already running.
         3.
         """
-        #if not self.emg_app.started:
-        self.statusbar.showMessage("Acquisition should be started before recording.")
-        error_dialog = QErrorMessage()
-        error_dialog.showMessage('Oh no!')
-        return
+        if not self.emg_app.started:
+            ret = QMessageBox.critical(self, "Critical",
+                  'Acquisition should be started before recording.',
+                  QMessageBox.Ok)
+            if ret == QMessageBox.Ok:
+                return
+
+        ret = QFileDialog(self, "Save Raw EMG Recording.",
+                          os.path.realpath(__file__) + "/new_record.txt",
+                          "Text files (*.txt)")
+        ret = ret.exec_()
+        print(ret)
 
     def tab_changed(self, tab_index):
         """ For every change in the visible tab, it disables the unused threads.
@@ -126,17 +134,13 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         """
         if tab_index == 0:
             self.emg_app.plotHandler.enable()
-            print("enabled")
         else:
             self.emg_app.plotHandler.disable()
-            print("disabled")
 
         if tab_index == 1:
             self.emg_app.feature_plot_handler.enable()
-            print("enabled")
         else:
             self.emg_app.feature_plot_handler.disable()
-            print("disabled")
 
 
     def find_serial_port(self):
