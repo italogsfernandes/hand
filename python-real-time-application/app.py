@@ -122,11 +122,26 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
             if ret == QMessageBox.Ok:
                 return
 
-        ret = QFileDialog(self, "Save Raw EMG Recording.",
-                          os.path.realpath(__file__) + "/new_record.txt",
-                          "Text files (*.txt)")
-        ret = ret.exec_()
-        print(ret)
+        fileName = QFileDialog.getSaveFileName(self,
+                        "Save Raw EMG Recording",
+                        os.path.realpath(__file__) + "/new_record.txt",
+                        "Text files (*.txt)",
+                        options = QFileDialog.DontUseNativeDialog)
+
+        if not fileName:
+            return
+
+        if sys.version_info.major == 3:
+            fileName = fileName[0]
+
+        self.statusbar.showMessage("File selected: " + str(fileName))
+        self.label_file_name.setText("File: " + fileName.split('/')[-1])
+
+        #QFile file(fileName)
+        #if (!file.open(QIODevice::WriteOnly))
+        #    QMessageBox::information(this, tr("Unable to open file"),
+        #        file.errorString())
+        #        return
 
     def tab_changed(self, tab_index):
         """ For every change in the visible tab, it disables the unused threads.
