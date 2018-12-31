@@ -125,7 +125,7 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         fileName = QFileDialog.getSaveFileName(self,
                         "Save Raw EMG Recording",
                         os.path.realpath(__file__) + "/new_record.txt",
-                        "Text files (*.txt)",
+                        "CSV files (*.csv)",
                         options = QFileDialog.DontUseNativeDialog)
 
         if not fileName:

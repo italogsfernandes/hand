@@ -105,6 +105,9 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.plotHandler.lines[3].set_visible(False)
         self.emg_values = [0] * 4
 
+        self.saving_to_file = False
+        self.file_obj = None
+
         #################################################
         #NOTE: Put it in another place, only for testing:
         #################################################
@@ -134,6 +137,20 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         ######################################################
         #NOTE: Put it in another place, only for testing [END]
         ######################################################
+
+    def start_saving_to_file_routine(self, file_name):
+        # Open file
+        self.file_obj = open(file_name, mode='w+')
+        # Write Header
+        self.file_obj.write("CH1,CH2,CH3,CH4,OUTPUT\n")
+        # Adding Flag
+        self.saving_to_file = True
+
+    def stop_saving_to_file_routine(self):
+        # Stopping Flag
+        self.saving_to_file = False
+        # Closing file
+        self.file_obj.close()
 
     def get_buffers_status(self, separator):
         """
@@ -183,6 +200,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.timerStatus.stop()
         self.plotHandler.timer.stop()
         self.feature_plot_handler.stop_update()
+        self.stop_saving_to_file_routine()
 
 
     #NOTE: I will put the process found inside the counsumer function inside this fuctions:
