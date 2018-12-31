@@ -335,70 +335,76 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
             self.emg_values[self.emg_values == 0] += (-0.045 + self.noise_vector[self.noise_index] * 0.0075)
             ####################################################
 
-            ####################################################
-            # Creating windows for pre processing
-            self.ch1_mva_window[:-1] = self.ch1_mva_window[1:]
-            self.ch1_mva_window[-1] = self.emg_values[0]
+            if self.saving_to_file:
+                self.file_obj.write(
+                                  str(self.emg_values[0]) + "," +\
+                                  str(self.emg_values[1]) + "," +\
+                                  str(self.emg_values[2]) + "," +\
+                                  str(self.emg_values[3]) + "," +\
+                                  str(self.output_value))
+            else:
+                ####################################################
+                # Creating windows for pre processing
+                self.ch1_mva_window[:-1] = self.ch1_mva_window[1:]
+                self.ch1_mva_window[-1] = self.emg_values[0]
 
-            self.ch2_mva_window[:-1] = self.ch2_mva_window[1:]
-            self.ch2_mva_window[-1] = self.emg_values[1]
+                self.ch2_mva_window[:-1] = self.ch2_mva_window[1:]
+                self.ch2_mva_window[-1] = self.emg_values[1]
 
-            self.ch3_mva_window[:-1] = self.ch3_mva_window[1:]
-            self.ch3_mva_window[-1] = self.emg_values[2]
+                self.ch3_mva_window[:-1] = self.ch3_mva_window[1:]
+                self.ch3_mva_window[-1] = self.emg_values[2]
 
-            self.ch4_mva_window[:-1] = self.ch4_mva_window[1:]
-            self.ch4_mva_window[-1] = self.emg_values[3]
-            ####################################################
+                self.ch4_mva_window[:-1] = self.ch4_mva_window[1:]
+                self.ch4_mva_window[-1] = self.emg_values[3]
+                ####################################################
 
-            ####################################################
-            # Applying high-pass mva filter to remove offset
-            self.emg_values[0] -= np.mean(self.ch1_mva_window)
-            self.emg_values[1] -= np.mean(self.ch2_mva_window)
-            self.emg_values[2] -= np.mean(self.ch3_mva_window)
-            self.emg_values[3] -= np.mean(self.ch4_mva_window)
-            ####################################################
+                ####################################################
+                # Applying high-pass mva filter to remove offset
+                self.emg_values[0] -= np.mean(self.ch1_mva_window)
+                self.emg_values[1] -= np.mean(self.ch2_mva_window)
+                self.emg_values[2] -= np.mean(self.ch3_mva_window)
+                self.emg_values[3] -= np.mean(self.ch4_mva_window)
+                ####################################################
 
-            ####################################################
-            # Creating windows for extraction of features
-            #BUG: I don't know if this will work, but I hope so. I'm still have to test it
-            # Adding values to window
-            self.ch1_features_window[self.features_window_index] = self.emg_values[0]
-            self.ch2_features_window[self.features_window_index] = self.emg_values[1]
-            self.ch3_features_window[self.features_window_index] = self.emg_values[2]
-            self.ch4_features_window[self.features_window_index] = self.emg_values[3]
-            #
-            # 0 1 2 3 4 5 6 7 8 9 10
-            # 0 1 2 3 4
-            #         4 5 6 7
-            #               7 8 9 1
-            # incrementing index
-            self.features_window_index = self.features_window_index + 1
-            if self.features_window_index >= self.features_window_size:
-                self.features_window_index = self.features_window_overlap
-                self.ch1_features_window[:self.features_window_overlap] = self.ch1_features_window[-self.features_window_overlap:]
-                self.ch2_features_window[:self.features_window_overlap] = self.ch2_features_window[-self.features_window_overlap:]
-                self.ch3_features_window[:self.features_window_overlap] = self.ch3_features_window[-self.features_window_overlap:]
-                self.ch4_features_window[:self.features_window_overlap] = self.ch4_features_window[-self.features_window_overlap:]
-            ####################################################
+                ####################################################
+                # Creating windows for extraction of features
+                #BUG: I don't know if this will work, but I hope so. I'm still have to test it
+                # Adding values to window
+                self.ch1_features_window[self.features_window_index] = self.emg_values[0]
+                self.ch2_features_window[self.features_window_index] = self.emg_values[1]
+                self.ch3_features_window[self.features_window_index] = self.emg_values[2]
+                self.ch4_features_window[self.features_window_index] = self.emg_values[3]
+                #
+                # 0 1 2 3 4 5 6 7 8 9 10
+                # 0 1 2 3 4
+                #         4 5 6 7
+                #               7 8 9 1
+                # incrementing index
+                self.features_window_index = self.features_window_index + 1
+                if self.features_window_index >= self.features_window_size:
+                    self.features_window_index = self.features_window_overlap
+                    self.ch1_features_window[:self.features_window_overlap] = self.ch1_features_window[-self.features_window_overlap:]
+                    self.ch2_features_window[:self.features_window_overlap] = self.ch2_features_window[-self.features_window_overlap:]
+                    self.ch3_features_window[:self.features_window_overlap] = self.ch3_features_window[-self.features_window_overlap:]
+                    self.ch4_features_window[:self.features_window_overlap] = self.ch4_features_window[-self.features_window_overlap:]
+                ####################################################
 
-            ####################################################
-            # Extracting features
-            if self.features_window_index == self.features_window_overlap:
-                # if I had completed a window and i'm ready to start the next one
-                self.apply_feature_extraction()
-                self.send_features_to_plot()
-            ####################################################
-
-
-            ####################################################
-            # Applying some adjusts to allow a good plot
-            for n in range(4):
-                self.emg_values[n] = self.emg_values[n] + n
-            ####################################################
+                ####################################################
+                # Extracting features
+                if self.features_window_index == self.features_window_overlap:
+                    # if I had completed a window and i'm ready to start the next one
+                    self.apply_feature_extraction()
+                    self.send_features_to_plot()
+                ####################################################
 
             ####################################################
             # Sending data to chart
             if self.plotHandler.is_enabled:
+                ####################################################
+                # Applying some adjusts to allow a good plot
+                for n in range(4):
+                    self.emg_values[n] = self.emg_values[n] + n
+                ####################################################
                 self.plotHandler.lines[0].buffer.put(self.emg_values[0])
                 self.plotHandler.lines[1].buffer.put(self.emg_values[1])
                 self.plotHandler.lines[2].buffer.put(self.emg_values[2])
