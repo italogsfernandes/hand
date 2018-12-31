@@ -201,7 +201,8 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.timerStatus.stop()
         self.plotHandler.timer.stop()
         self.feature_plot_handler.stop_update()
-        self.stop_saving_to_file_routine()
+        if self.file_obj:
+            self.stop_saving_to_file_routine()
 
 
     #NOTE: I will put the process found inside the counsumer function inside this fuctions:
