@@ -76,6 +76,8 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.cb_ch3.toggle() # enabling visibility of channel
         self.cb_ch4.toggle() # enabling visibility of channel
 
+        self.tabWidget.setCurrentIndex(0)
+
         self.emg_app.feature_plot_handler.series[0].set_visible(True) # 0.3
         self.emg_app.feature_plot_handler.series[1].set_visible(True) # 100.0
         self.emg_app.feature_plot_handler.series[2].set_visible(True) # 0.2
@@ -104,6 +106,19 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.cb_chart_emg_on_off.toggled.connect(self.turn_chart_emg_on_off)
         self.cb_chart_features_on_off.toggled.connect(self.turn_chart_features_on_off)
         self.tabWidget.currentChanged.connect(self.tab_changed)
+        self.btn_record_raw_emg.clicked.connect(self.btn_record_raw_emg_clicked)
+
+    def btn_record_raw_emg_clicked(self):
+        """ Save values to a file.
+        1. Select the file.
+        2. Acquisition should be already running.
+        3.
+        """
+        #if not self.emg_app.started:
+        self.statusbar.showMessage("Acquisition should be started before recording.")
+        error_dialog = QErrorMessage()
+        error_dialog.showMessage('Oh no!')
+        return
 
     def tab_changed(self, tab_index):
         """ For every change in the visible tab, it disables the unused threads.
