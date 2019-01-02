@@ -108,6 +108,39 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.cb_chart_features_on_off.toggled.connect(self.turn_chart_features_on_off)
         self.tabWidget.currentChanged.connect(self.tab_changed)
         self.btn_record_raw_emg.clicked.connect(self.btn_record_raw_emg_clicked)
+        self.btn_generate_training_file.clicked.connect(self.btn_generate_training_file_clicked)
+
+    def btn_generate_training_file_clicked(self):
+        #################################################
+        # Selecting file
+        #################################################
+        fileName = QFileDialog.getOpenFileNames(self,
+                        "Open Raw EMG Recording",
+                        "",
+                        "CSV files (*.csv)",
+                        options = QFileDialog.DontUseNativeDialog)
+        #################################################
+        # Condition 2
+        #################################################
+        if not fileName:
+            return
+
+        #################################################
+        # Updating interface
+        #################################################
+        if len(fileName) == 1:
+            self.statusbar.showMessage("File selected: " + fileName[0].split('/')[-1])
+        elif len(fileName) == 2:
+            self.statusbar.showMessage("Files selected: " + fileName[0].split('/')[-1] + " and " + fileName[1].split('/')[-1])
+        elif len(fileName) >= 3:
+            self.statusbar.showMessage("Files selected: " + fileName[0].split('/')[-1] + " and others " + str(len(fileName) - 1) + " files.")
+        #self.btn_record_raw_emg.setText("Stop Recording")
+
+        #################################################
+        # Starting recording process
+        #################################################
+        #self.emg_app.start_saving_to_file_routine(fileName)
+
 
     def keyPressEvent(self, event):
         if type(event) == QKeyEvent:
@@ -156,7 +189,7 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
             #################################################
             fileName = QFileDialog.getSaveFileName(self,
                             "Save Raw EMG Recording",
-                            os.path.realpath(__file__) + "/new_record.csv",
+                            "",
                             "CSV files (*.csv)",
                             options = QFileDialog.DontUseNativeDialog)
             #################################################
