@@ -343,7 +343,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                                   str(self.emg_values[1]) + "," +\
                                   str(self.emg_values[2]) + "," +\
                                   str(self.emg_values[3]) + "," +\
-                                  str(self.move_output_value))
+                                  str(self.move_output_value) + "\n")
             else:
                 ####################################################
                 # Creating windows for pre processing

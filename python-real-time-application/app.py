@@ -109,39 +109,77 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.tabWidget.currentChanged.connect(self.tab_changed)
         self.btn_record_raw_emg.clicked.connect(self.btn_record_raw_emg_clicked)
 
+    def keyPressEvent(self, event):
+        if type(event) == QKeyEvent:
+            if not event.isAutoRepeat():
+                if self.emg_app.saving_to_file:
+                    self.emg_app.move_output_value = event.text()
+                    self.lbl_output_value.setText(event.text())
+                    self.statusbar.showMessage("key pressed: " + str(event.text()))
+
+    def keyReleaseEvent(self, event):
+        if type(event) == QKeyEvent:
+            if not event.isAutoRepeat():
+                if self.emg_app.saving_to_file:
+                    self.emg_app.move_output_value = "0"
+                    self.lbl_output_value.setText("None")
+                    self.statusbar.showMessage("key released: " + str(event.text()))
+
     def btn_record_raw_emg_clicked(self):
         """ Save values to a file.
         1. Select the file.
         2. Acquisition should be already running.
         3.
         """
-        if not self.emg_app.started:
-            ret = QMessageBox.critical(self, "Critical",
-                  'Acquisition should be started before recording.',
-                  QMessageBox.Ok)
-            if ret == QMessageBox.Ok:
+        #################################################
+        # Stop actual recording
+        #################################################
+        if self.emg_app.saving_to_file:
+            self.emg_app.stop_saving_to_file_routine()
+            self.label_file_name.setText("File: None")
+            self.btn_record_raw_emg.setText("Start Recording")
+        #################################################
+        # Start a recording
+        #################################################
+        else:
+            #################################################
+            # Condition 1
+            #################################################
+            if not self.emg_app.started:
+                ret = QMessageBox.critical(self, "Critical",
+                      'Acquisition should be started before recording.',
+                      QMessageBox.Ok)
+                if ret == QMessageBox.Ok:
+                    return
+            #################################################
+            # Selecting file
+            #################################################
+            fileName = QFileDialog.getSaveFileName(self,
+                            "Save Raw EMG Recording",
+                            os.path.realpath(__file__) + "/new_record.csv",
+                            "CSV files (*.csv)",
+                            options = QFileDialog.DontUseNativeDialog)
+            #################################################
+            # Condition 2
+            #################################################
+            if not fileName:
                 return
 
-        fileName = QFileDialog.getSaveFileName(self,
-                        "Save Raw EMG Recording",
-                        os.path.realpath(__file__) + "/new_record.txt",
-                        "CSV files (*.csv)",
-                        options = QFileDialog.DontUseNativeDialog)
+            # Garanting compatibility between python 2 and 3
+            if sys.version_info.major == 3:
+                fileName = fileName[0]
 
-        if not fileName:
-            return
+            #################################################
+            # Updating interface
+            #################################################
+            self.statusbar.showMessage("File selected: " + str(fileName))
+            self.label_file_name.setText("File: " + fileName.split('/')[-1])
+            self.btn_record_raw_emg.setText("Stop Recording")
 
-        if sys.version_info.major == 3:
-            fileName = fileName[0]
-
-        self.statusbar.showMessage("File selected: " + str(fileName))
-        self.label_file_name.setText("File: " + fileName.split('/')[-1])
-
-        #QFile file(fileName)
-        #if (!file.open(QIODevice::WriteOnly))
-        #    QMessageBox::information(this, tr("Unable to open file"),
-        #        file.errorString())
-        #        return
+            #################################################
+            # Starting recording process
+            #################################################
+            self.emg_app.start_saving_to_file_routine(fileName)
 
     def tab_changed(self, tab_index):
         """ For every change in the visible tab, it disables the unused threads.
