@@ -169,19 +169,5 @@ class EMGProcessing:
         if self.features_window_index == self.features_window_overlap:
             # if I had completed a window and i'm ready to start the next one
             self.apply_feature_extraction()
-            self.send_features_to_plot()
+            self.call_when_features_window_is_full()
         ####################################################
-
-    ####################################################
-    # Sending data to chart
-    if self.plotHandler.is_enabled:
-        ####################################################
-        # Applying some adjusts to allow a good plot
-        for n in range(4):
-            self.emg_values[n] = self.emg_values[n] + n
-        ####################################################
-        self.plotHandler.lines[0].buffer.put(self.emg_values[0])
-        self.plotHandler.lines[1].buffer.put(self.emg_values[1])
-        self.plotHandler.lines[2].buffer.put(self.emg_values[2])
-        self.plotHandler.lines[3].buffer.put(self.emg_values[3])
-    ####################################################
