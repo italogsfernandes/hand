@@ -15,8 +15,7 @@ from feature_extractor import *
 #########################
 
 volunteer_id = 6
-dataset = pd.read_csv('datasets/volunteer_'+str(volunteer_id)+'.csv', sep=',')#,
-# nrows=150000)
+dataset = pd.read_csv('datasets/volunteer_'+str(volunteer_id)+'.csv', sep=',', nrows=150000)
 
 emg_channels = dataset.iloc[:, 1:-1].values
 emg_out = dataset.iloc[:, -1].values
@@ -70,9 +69,11 @@ Nhp = 100
 Nlp = 32
 N65hz = 5
 N55hz = 6
+N45hz = 7
 print("high_pass filter for offset: %.2f" % (Fs * 0.32 / np.sqrt((Nhp**2)-1)))
 print("low_pass filter for envelope: %.2f" % (Fs * 0.32 / np.sqrt((Nlp**2)-1)))
-print("band_stop filter f1: %.2f" % (Fs * 0.32 / np.sqrt((N55hz**2)-1)))
+print("band_stop filter f1: %.2f" % (Fs * 0.32 / np.sqrt((N45hz**2)-1)))
+print("band_stop filter f2: %.2f" % (Fs * 0.32 / np.sqrt((N55hz**2)-1)))
 print("band_stop filter f2: %.2f" % (Fs * 0.32 / np.sqrt((N65hz**2)-1)))
 print("Total atraso: %.3f s" % ((1/Fs) * (Nhp+Nlp+N55hz+N65hz)))
 
