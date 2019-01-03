@@ -2,7 +2,6 @@
 # ------------------------------------------------------------------------------
 # FEDERAL UNIVERSITY OF UBERLANDIA
 # Faculty of Electrical Engineering
-# Biomedical Engineering Lab
 # ------------------------------------------------------------------------------
 # Author: Italo Gustavo Sampaio Fernandes
 # Contact: italogsfernandes@gmail.com
@@ -77,7 +76,7 @@ class EMGProcessing:
 
         self.features_division_factors = [0.3, 100.0, 0.2, 0.9, 55.0, 150.0]
 
-    def do_high_pass_window(self, values_array):
+    def do_high_pass_filtering(self, values_array):
         """ Creating windows for pre processing
         """
         self.high_pass_window['CH1'][:-1] = self.high_pass_window['CH1'][1:]
@@ -97,7 +96,7 @@ class EMGProcessing:
         values_array[2] = values_array[2] - np.mean(self.high_pass_window['CH3'])
         values_array[3] = values_array[3] - np.mean(self.high_pass_window['CH4'])
 
-    def do_stop_band_window(self, values_array):
+    def do_stop_band_filtering(self, values_array):
         self.high_pass_45hz_window['CH1'][:-1] = self.high_pass_45hz_window['CH1'][1:]
         self.high_pass_45hz_window['CH1'][-1] = values_array[0]
 
@@ -168,6 +167,54 @@ class EMGProcessing:
         # Extracting features
         if self.features_window_index == self.features_window_overlap:
             # if I had completed a window and i'm ready to start the next one
-            self.apply_feature_extraction()
-            self.call_when_features_window_is_full()
+            self.do_features_extraction()
+            #self.call_when_features_window_is_full()
         ####################################################
+
+    def do_features_extraction(self):
+        self.ch1_features = get_features(features_window['CH1'])
+        self.ch2_features = get_features(features_window['CH2'])
+        self.ch3_features = get_features(features_window['CH3'])
+        self.ch4_features = get_features(features_window['CH4'])
+
+    def do_offline_pre_processing(self, emg_channels, emg_out):
+        emg_pre_processed = np.zeros(emg_channels.shape)
+        for ch in range(4):
+            emg_no_offset = do_high_pass_mva(emg_channels[:,ch],
+             self.high_pass_mva_window_size)
+            emg_pre_processed[:, ch] = do_band_stop_mva(emg_no_offset,
+             self.high_pass_45hz_mva_window_size,
+             self.low_pass_55hz_mva_window_size)
+        return emg_pre_processed
+
+    def do_offline_features_extraction(self, emg_pre_processed):
+        for n in range(len(emg_pre_processed)):
+            self.add_to_features_window(emg_pre_processed[n,:])
+
+    def offline_write_to_file_operation(self, file_name):
+
+
+    def do_offline_routine(self, file_name):
+        """
+        Open file
+        Read info (advertise if file is too big)
+        Close file
+        Open output file
+        Write header
+        write
+        """
+        #########################
+        # Openning File
+        #########################
+        self.file_obj = open(file_name, mode='r')
+        self.file_obj = open(output_file_name, mode='r')
+        #########################
+        # Writing Header
+        #########################
+        output_file.write("rms0,rms1,rms2,rms3,")
+        output_file.write("zc0,zc1,zc2,zc3,")
+        output_file.write("mav0,mav1,mav2,mav3,")
+        output_file.write("var0,var1,var2,var3,")
+        output_file.write("wl0,wl1,wl2,wl3,")
+        output_file.write("ssc0,ssc1,ssc2,ssc3,")
+        output_file.write("output\n")
