@@ -11,9 +11,12 @@
 # Description:
 # ------------------------------------------------------------------------------
 from ArduinoEMGPlotter import ArduinoEMGPlotter
+from ArduinoOutputController import ArduinoOutputController
 
 import sys
 import os
+
+import serial.tools.list_ports as serial_tools
 
 # Including Libraries according to python version
 if sys.version_info.major == 3:
@@ -41,6 +44,24 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         # connections between buttons and methods:
         self.setup_signals_connections()
 
+        ##############
+        # Serial Port Selection
+        ##############
+        serial_ports = serial_tools.comports()
+
+        self.cb_in_serial_port.addItem("None")
+        self.cb_out_serial_port.addItem("None")
+
+        for s_port in serial_ports:
+            self.cb_in_serial_port.addItem(str(s_port))
+            self.cb_out_serial_port.addItem(str(s_port))
+
+        self.cb_in_serial_port.selected = 0
+        self.cb_out_serial_port.selected = 0
+        #############
+
+        #Output
+        self.servo_controller = ArduinoOutputController()
         # Object to acquire EMG signals and plot it (using the serial port).
         self.emg_app = ArduinoEMGPlotter(parent=self.centralwidget,label=self.lbl_status)
 
@@ -77,7 +98,7 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.cb_ch3.toggle() # enabling visibility of channel
         self.cb_ch4.toggle() # enabling visibility of channel
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(5)
 
         self.emg_app.feature_plot_handler.series[0].set_visible(True) # 0.3
         self.emg_app.feature_plot_handler.series[1].set_visible(True) # 100.0
@@ -109,6 +130,56 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.tabWidget.currentChanged.connect(self.tab_changed)
         self.btn_record_raw_emg.clicked.connect(self.btn_record_raw_emg_clicked)
         self.btn_generate_training_file.clicked.connect(self.btn_generate_training_file_clicked)
+        #self.connect(self.cb_in_serial_port,SIGNAL('currentIndexChanged(int)'),self.cb_in_serial_port_changed)
+        #self.connect(self.cb_out_serial_port,SIGNAL('currentIndexChanged(int)'),self.cb_out_serial_port_changed)
+        self.btn_go.clicked.connect(self.btn_go_clicked)
+        self.h_slider_1.valueChanged.connect(self.sliders_changed)
+        self.h_slider_2.valueChanged.connect(self.sliders_changed)
+        self.h_slider_3.valueChanged.connect(self.sliders_changed)
+        self.h_slider_4.valueChanged.connect(self.sliders_changed)
+        self.h_slider_5.valueChanged.connect(self.sliders_changed)
+        self.btn_reset_position.clicked.connect(self.btn_reset_position_clicked)
+        self.btn_send_position.clicked.connect(self.btn_send_position_clicked)
+
+    def btn_send_position_clicked(self):
+        f_values = [self.h_slider_1.value(),
+                    self.h_slider_2.value(),
+                    self.h_slider_3.value(),
+                    self.h_slider_4.value(),
+                    self.h_slider_5.value()]
+        self.servo_controller.send_new_cmd(f_values)
+
+    def btn_reset_position_clicked(self):
+        self.h_slider_1.setValue(0)
+        self.h_slider_2.setValue(0)
+        self.h_slider_3.setValue(0)
+        self.h_slider_4.setValue(0)
+        self.h_slider_5.setValue(0)
+        self.btn_send_position_clicked()
+
+    def sliders_changed(self):
+        self.groupBox_f1.setTitle(u'Finger 1: %dº' % self.h_slider_1.value())
+        self.groupBox_f2.setTitle(u'Finger 2: %dº' % self.h_slider_2.value())
+        self.groupBox_f3.setTitle(u'Finger 3: %dº' % self.h_slider_3.value())
+        self.groupBox_f4.setTitle(u'Finger 4: %dº' % self.h_slider_4.value())
+        self.groupBox_f5.setTitle(u'Finger 5: %dº' % self.h_slider_5.value())
+
+    def btn_go_clicked(self):
+        port_in_name = str(self.cb_in_serial_port.itemText(self.cb_in_serial_port.currentIndex()))
+        port_out_name = str(self.cb_out_serial_port.itemText(self.cb_out_serial_port.currentIndex()))
+
+        if port_out_name != "None":
+            port_out_name = port_out_name.split()[0]
+            self.servo_controller.open_port(port_out_name)
+            self.tabWidget.setCurrentIndex(3)
+
+        #0 90 30 40 50
+
+    def cb_in_serial_port_changed(self, new_index):
+        pass
+
+    def cb_out_serial_port_changed(self, new_index):
+        pass
 
     def btn_generate_training_file_clicked(self):
         #################################################

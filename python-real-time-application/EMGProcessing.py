@@ -192,12 +192,12 @@ class EMGProcessing:
             self.add_to_features_window(emg_pre_processed[n,:])
 
     def offline_write_to_file_operation(self, file_name):
-
+        pass
 
     def do_offline_routine(self, file_name):
         """
         Open file
-        Read info (advertise if file is too big)
+        Read info (tell if file is too big)
         Close file
         Open output file
         Write header
