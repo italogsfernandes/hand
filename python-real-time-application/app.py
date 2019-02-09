@@ -100,9 +100,9 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
 
         # Setting up inicial conditions:
         self.cb_ch1.toggle() # enabling visibility of channel
-        self.cb_ch2.toggle() # enabling visibility of channel
-        self.cb_ch3.toggle() # enabling visibility of channel
-        self.cb_ch4.toggle() # enabling visibility of channel
+        #self.cb_ch2.toggle() # enabling visibility of channel
+        #self.cb_ch3.toggle() # enabling visibility of channel
+        #self.cb_ch4.toggle() # enabling visibility of channel
 
         self.tabWidget.setCurrentIndex(5)
 
