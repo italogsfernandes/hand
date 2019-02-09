@@ -140,6 +140,10 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.btn_send_position.clicked.connect(self.btn_send_position_clicked)
         self.btn_close_position.clicked.connect(self.btn_close_position_clicked)
         self.btn_laser.clicked.connect(self.btn_laser_clicked)
+        self.checkBox_simulation.toggled.connect(self.using_simulation_toggled)
+
+    def using_simulation_toggled(self, new_state):
+        self.emg_app.data_from_simulation = new_state
 
     def btn_laser_clicked(self):
         self.servo_controller.send_cmd_laser()

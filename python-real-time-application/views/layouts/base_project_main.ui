@@ -619,48 +619,24 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QLabel" name="label_acquiring_status">
+             <widget class="QCheckBox" name="checkBox_simulation">
               <property name="text">
-               <string>Acquiring: Off</string>
+               <string>Using Simulation</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_plotting_status">
+             <widget class="QCheckBox" name="checkBox_simple_mode">
               <property name="text">
-               <string>Plotting: Off</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_processing_status">
-              <property name="text">
-               <string>Processing: Off</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_classification_status">
-              <property name="text">
-               <string>Classification: Off</string>
+               <string>Simple Mode</string>
               </property>
              </widget>
             </item>
            </layout>
           </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_status">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayoutCheckBoxes">
