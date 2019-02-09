@@ -141,9 +141,17 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.btn_close_position.clicked.connect(self.btn_close_position_clicked)
         self.btn_laser.clicked.connect(self.btn_laser_clicked)
         self.checkBox_simulation.toggled.connect(self.using_simulation_toggled)
+        self.checkBox_simple_mode.toggled.connect(self.do_simple_mode)
+
+    def do_simple_mode(self, new_state):
+        #self.emg_app.simple_mode = new_state
+        self.emg_app.simple_mode = self.checkBox_simple_mode.isEnabled()
+        if self.emg_app.simple_mode:
+            self.emg_app.arduinoHandler.qnt_ch = 1 # TODO: find out if this will work
 
     def using_simulation_toggled(self, new_state):
-        self.emg_app.data_from_simulation = new_state
+        #self.emg_app.data_from_simulation = new_state
+        self.emg_app.data_from_simulation = self.checkBox_simulation.isEnabled()
 
     def btn_laser_clicked(self):
         self.servo_controller.send_cmd_laser()

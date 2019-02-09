@@ -108,7 +108,9 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.saving_to_file = False
         self.file_obj = None
         self.move_output_value = 0
+
         self.data_from_simulation = False
+        self.simple_mode = False
 
         #################################################
         #NOTE: Put it in another place, only for testing:
