@@ -56,8 +56,14 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
             self.cb_in_serial_port.addItem(str(s_port))
             self.cb_out_serial_port.addItem(str(s_port))
 
-        self.cb_in_serial_port.selected = 0
-        self.cb_out_serial_port.selected = 0
+        self.cb_in_serial_port.setCurrentIndex(0)
+        self.cb_out_serial_port.setCurrentIndex(0)
+
+        if len(serial_ports) > 0:
+            self.cb_in_serial_port.setCurrentIndex(1)
+
+        if len(serial_ports) > 1:
+            self.cb_out_serial_port.setCurrentIndex(2)
         #############
 
         #Output
@@ -175,24 +181,22 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
 
         if port_out_name != "None":
             port_out_name = port_out_name.split()[0]
-            self.servo_controller.open_port(port_out_name)
+            try:
+                self.servo_controller.open_port(port_out_name)
+            except Exception as e:
+                self.statusbar.showMessage("Not possible to connect. Please verify USB connection.")
             self.tabWidget.setCurrentIndex(3)
 
         if port_in_name != "None":
-            port_in_name = port_out_name.split()[0]
-            self.servo_controller.open_port(port_out_name)
+            port_in_name = port_in_name.split()[0]
+            self.emg_app.arduinoHandler.update_port_name(port_in_name)
             self.tabWidget.setCurrentIndex(0)
+            try:
+                self.emg_app.start()
+                self.actionStartAcquisition.setText("Stop Acquisition")
+            except Exception as e:
+                self.statusbar.showMessage("Not possible to start. Please verify USB connection.")
 
-        """
-        # trying to start acquisition
-        try:
-            self.emg_app.start()
-            self.actionStartAcquisition.setText("Stop Acquisition")
-        except Exception as e:
-            self.statusbar.showMessage("Not possible to automatically start. Please verify USB connection.")
-            self.lbl_status.setText("Select Functions -> Start Acquisition for start.")
-            #0 90 30 40 50
-        """
     def cb_in_serial_port_changed(self, new_index):
         pass
 
@@ -321,9 +325,22 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
     def find_serial_port(self):
         """ Try to find a active serial port.
         """
-        bar_foo = self.emg_app.arduinoHandler.update_port_name()
-        self.statusbar.showMessage(bar_foo)
-        self.lbl_status.setText(bar_foo)
+        serial_ports = serial_tools.comports()
+
+        self.cb_in_serial_port.addItem("None")
+        self.cb_out_serial_port.addItem("None")
+        self.cb_in_serial_port.selected = 0
+        self.cb_out_serial_port.selected = 0
+
+        for s_port in serial_ports:
+            self.cb_in_serial_port.addItem(str(s_port))
+            self.cb_out_serial_port.addItem(str(s_port))
+
+        if len(serial_ports) > 0:
+            self.cb_out_serial_port.selected = 1
+
+        if len(serial_ports) > 1:
+            self.cb_in_serial_port.selected = 2
 
     def turn_chart_emg_on_off(self, cb_value):
         """ Enables and disables the emg chart.

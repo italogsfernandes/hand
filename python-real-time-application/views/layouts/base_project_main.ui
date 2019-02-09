@@ -322,16 +322,23 @@
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_10">
                <item>
+                <widget class="QPushButton" name="btn_laser">
+                 <property name="text">
+                  <string>Laser</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="btn_reset_position">
                  <property name="text">
-                  <string>Reset</string>
+                  <string>Open Hand</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QPushButton" name="btn_close_position">
                  <property name="text">
-                  <string>Close</string>
+                  <string>Close Hand</string>
                  </property>
                 </widget>
                </item>

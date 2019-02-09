@@ -78,9 +78,12 @@ class ArduinoHandler:
         self.thread_acquisition = ThreadHandler(self.acquire_routine, self.close)
         self.buffer_acquisition = Queue(1024*4)
 
-    def update_port_name(self):
+    def update_port_name(self, p_name = None):
         self.serial_tools_obj = None
-        self.serialPort.port = ArduinoHandler.get_arduino_serial_port()
+        if p_name is None:
+            self.serialPort.port = ArduinoHandler.get_arduino_serial_port()
+        else:
+            self.serialPort.port = str(p_name)
 
         if len(serial_tools.comports()):
             self.serial_tools_obj = [s for s in serial_tools.comports() if s.device == str(self.serialPort.name)][0]
