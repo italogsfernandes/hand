@@ -107,14 +107,6 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.emg_app.feature_plot_handler.series[4].set_visible(True) # 55.0
         self.emg_app.feature_plot_handler.series[5].set_visible(True) # 150.0
 
-        # trying to start acquisition
-        try:
-            self.emg_app.start()
-            self.actionStartAcquisition.setText("Stop Acquisition")
-        except Exception as e:
-            self.statusbar.showMessage("Not possible to automatically start. Please verify USB connection.")
-            self.lbl_status.setText("Select Functions -> Start Acquisition for start.")
-
     def setup_signals_connections(self):
         """ Connects the events of objects in the view (buttons, combobox, etc)
         to respective methods.
@@ -140,6 +132,11 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.h_slider_5.valueChanged.connect(self.sliders_changed)
         self.btn_reset_position.clicked.connect(self.btn_reset_position_clicked)
         self.btn_send_position.clicked.connect(self.btn_send_position_clicked)
+        self.btn_close_position.clicked.connect(self.btn_close_position_clicked)
+        self.btn_laser.clicked.connect(self.btn_laser_clicked)
+
+    def btn_laser_clicked(self):
+        self.servo_controller.send_cmd_laser()
 
     def btn_send_position_clicked(self):
         f_values = [self.h_slider_1.value(),
@@ -148,6 +145,14 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
                     self.h_slider_4.value(),
                     self.h_slider_5.value()]
         self.servo_controller.send_new_cmd(f_values)
+
+    def btn_close_position_clicked(self):
+        self.h_slider_1.setValue(90)
+        self.h_slider_2.setValue(90)
+        self.h_slider_3.setValue(90)
+        self.h_slider_4.setValue(90)
+        self.h_slider_5.setValue(90)
+        self.btn_send_position_clicked()
 
     def btn_reset_position_clicked(self):
         self.h_slider_1.setValue(0)
@@ -173,8 +178,21 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
             self.servo_controller.open_port(port_out_name)
             self.tabWidget.setCurrentIndex(3)
 
-        #0 90 30 40 50
+        if port_in_name != "None":
+            port_in_name = port_out_name.split()[0]
+            self.servo_controller.open_port(port_out_name)
+            self.tabWidget.setCurrentIndex(0)
 
+        """
+        # trying to start acquisition
+        try:
+            self.emg_app.start()
+            self.actionStartAcquisition.setText("Stop Acquisition")
+        except Exception as e:
+            self.statusbar.showMessage("Not possible to automatically start. Please verify USB connection.")
+            self.lbl_status.setText("Select Functions -> Start Acquisition for start.")
+            #0 90 30 40 50
+        """
     def cb_in_serial_port_changed(self, new_index):
         pass
 
@@ -327,6 +345,7 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         """ Method called when the application is being closed.
         Closes the serial port before closing application.
         """
+        self.servo_controller.close()
         self.emg_app.stop()
         super(self.__class__, self).closeEvent(q_close_event)
 

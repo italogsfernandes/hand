@@ -329,6 +329,13 @@
                 </widget>
                </item>
                <item>
+                <widget class="QPushButton" name="btn_close_position">
+                 <property name="text">
+                  <string>Close</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="btn_send_position">
                  <property name="text">
                   <string>Send</string>
