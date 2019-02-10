@@ -70,7 +70,8 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.servo_controller = ArduinoOutputController()
         # Object to acquire EMG signals and plot it (using the serial port).
         self.emg_app = ArduinoEMGPlotter(parent=self.centralwidget,label=self.lbl_status)
-
+        self.contraction_started_routine = self.do_start_contraction_event
+        self.contraction_finished_routine = self.do_finish_contraction_event
         ####################
         ###### Some Ui modifications
         ### Combo box features
@@ -143,11 +144,17 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.checkBox_simulation.toggled.connect(self.using_simulation_toggled)
         self.checkBox_simple_mode.toggled.connect(self.do_simple_mode)
 
+    def do_start_contraction_event(self):
+        self.btn_close_position_clicked()
+
+    def do_finish_contraction_event(self):
+        self.btn_reset_position_clicked()
+
     def do_simple_mode(self, new_state):
         #self.emg_app.simple_mode = new_state
         self.emg_app.simple_mode = self.checkBox_simple_mode.isEnabled()
         if self.emg_app.simple_mode:
-            self.emg_app.arduinoHandler.qnt_ch = 1 # TODO: find out if this will work
+            self.emg_app.arduinoHandler.qnt_ch = 1 #TODO: find out if this will work
 
     def using_simulation_toggled(self, new_state):
         #self.emg_app.data_from_simulation = new_state

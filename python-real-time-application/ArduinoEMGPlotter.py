@@ -115,6 +115,37 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         #################################################
         #NOTE: Put it in another place, only for testing:
         #################################################
+        #########################
+        # High Pass Filter
+        #########################
+        self.high_pass_mva_window_size = 100 # 3.2 Hz
+        self.high_pass_window = np.zeros(self.high_pass_mva_window_size, dtype=np.float64)
+        #########################
+        # 50Hz Band Stop Filter
+        #########################
+        self.low_pass_55hz_mva_window_size = 6 # 54Hz
+        self.high_pass_45hz_mva_window_size = 7 # 46Hz
+        self.low_pass_55hz_window = np.zeros(self.low_pass_55hz_mva_window_size, dtype=np.float64)
+        self.high_pass_45hz_window = np.zeros(self.high_pass_45hz_mva_window_size, dtype=np.float64)
+        #########################
+        # High Pass Filter (Envelope)
+        #########################
+        self.low_pass_mva_window_size = 32 # 10Hz
+        self.low_pass_window = np.zeros(self.low_pass_mva_window_size, dtype=np.float64)
+        #################################
+        self.high_pass_filtered_value = 0
+        self.stop_band_filtered_value = 0
+        self.enve_lowp_filtered_value = 0
+
+        self.simple_threshould = 1
+        self.is_above_threshould = False
+        self.was_above_threshould = False
+        ################################
+        self.contraction_started_routine = None
+        self.contraction_finished_routine = None
+        ###############################
+        #################################################
+        #################################################
         self.mva_window_size = 500
         self.ch1_mva_window = np.zeros(self.mva_window_size, dtype='float')
         self.ch2_mva_window = np.zeros(self.mva_window_size, dtype='float')
@@ -141,6 +172,36 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         ######################################################
         #NOTE: Put it in another place, only for testing [END]
         ######################################################
+    def do_high_pass_filtering(self, current_value):
+        """ Creating windows for pre processing
+        """
+        self.high_pass_window[:-1] = self.high_pass_window[1:]
+        self.high_pass_window[-1] = current_value
+
+        high_pass_filtered_value = current_value - np.mean(self.high_pass_window)
+
+    def do_stop_band_filtering(self, current_value):
+        self.high_pass_45hz_window[:-1] = self.high_pass_45hz_window[1:]
+        self.high_pass_45hz_window[-1] = current_value
+
+        higher_freqs = current_value - np.mean(self.high_pass_45hz_window)
+
+        self.low_pass_55hz_window[:-1] = self.low_pass_55hz_window[1:]
+        self.low_pass_55hz_window[-1] = higher_freqs
+
+        stop_freqs = np.mean(self.low_pass_55hz_window)
+        stop_band_filtered_value = current_value - stop_freqs
+
+    def do_low_pass_filtering(self, current_value):
+        self.low_pass_window[:-1] = self.low_pass_window[1:]
+        self.low_pass_window[-1] = current_value
+
+        low_pass_filtered_value = np.mean(self.low_pass_window)
+
+    def do_pre_processing(self, current_value):
+        self.high_pass_filtered_value = self.do_high_pass_filtering(current_value)
+        self.stop_band_filtered_value = self.do_stop_band_filtering(high_pass_filtered_value)
+        self.enve_lowp_filtered_value = self.do_low_pass_filtering(np.abs(stop_band_filtered_value))
 
     def start_saving_to_file_routine(self, file_name):
         # Open file
@@ -343,19 +404,31 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
 
             if self.simple_mode:
                 ####################################################
-                # Creating windows for pre processing
-                self.ch1_mva_window[:-1] = self.ch1_mva_window[1:]
-                self.ch1_mva_window[-1] = self.emg_values[0]
-                ####################################################
-                # Applying high-pass mva filter to remove offset
-                self.emg_values[0] -= np.mean(self.ch1_mva_window)
-                # Applying 50Hz remove filter
-                # Applying low-pass mva filter
+                self.do_pre_processing(self.emg_values[0])
+                # Plotting purposes
+                self.emg_values[1] = self.high_pass_filtered_value
+                self.emg_values[2] = self.stop_band_filtered_value
+                self.emg_values[3] = self.enve_lowp_filtered_value
+                ####################
                 # Analysing envelope
-                #TODO: all
-                #TODO: all
-                #TODO: all
-                #TODO: all
+                ####################
+                self.is_above_threshould = self.enve_lowp_filtered_value > self.simple_threshould
+                ################################################################
+                ################################################################
+                ################################################################
+                if self.is_above_threshould and not self.was_above_threshould:
+                    print("Starting Contraction...")
+                    if self.contraction_started_routine is not None:
+                        self.contraction_started_routine()
+                if not self.is_above_threshould and self.was_above_threshould:
+                    print("Finishing Contraction...")
+                    if self.contraction_finished_routine is not None:
+                        self.contraction_finished_routine()
+                    #TODO: Call function of callback when a contraction is started
+                ################################################################
+                ################################################################
+                ################################################################
+                self.was_above_threshould = self.is_above_threshould
 
             if not self.simple_mode:
                 if self.saving_to_file:
