@@ -4,7 +4,7 @@ class ArduinoOutputController:
     """docstring for ArduinoOutputController."""
     def __init__(self):
         self.port_name = ""
-        self.serialPort = serial.Serial()
+        self.serialPort = serial.Serial(baudrate=115200)
 
     def open_port(self, p_name):
         self.port_name = p_name
@@ -35,10 +35,12 @@ class ArduinoOutputController:
         if not self.serialPort.isOpen():
             print("Not connected, the message %s was not sent." % out_str)
         else:
+            print("Sending: %s" % out_str)
             self.serialPort.write(out_str)
 
     def send_cmd_laser(self):
         if not self.serialPort.isOpen():
             print("Not connected, the message %s was not sent." % "L")
         else:
+            print("Sending: %s" % "L\n")
             self.serialPort.write("L\n")
