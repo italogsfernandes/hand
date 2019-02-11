@@ -23,7 +23,7 @@
 */
 //Uncomment the next line to activate the sending of data as text
 //This is usefull when you are using the serial plotter tool (Ctrl+shift+L)
-#define PLOTTER_SERIAL
+//#define PLOTTER_SERIAL
 
 
 //Libraries

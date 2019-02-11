@@ -178,7 +178,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.high_pass_window[:-1] = self.high_pass_window[1:]
         self.high_pass_window[-1] = current_value
 
-        high_pass_filtered_value = current_value - np.mean(self.high_pass_window)
+        return (current_value - np.mean(self.high_pass_window))
 
     def do_stop_band_filtering(self, current_value):
         self.high_pass_45hz_window[:-1] = self.high_pass_45hz_window[1:]
@@ -190,18 +190,18 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.low_pass_55hz_window[-1] = higher_freqs
 
         stop_freqs = np.mean(self.low_pass_55hz_window)
-        stop_band_filtered_value = current_value - stop_freqs
+        return (current_value - stop_freqs)
 
     def do_low_pass_filtering(self, current_value):
         self.low_pass_window[:-1] = self.low_pass_window[1:]
         self.low_pass_window[-1] = current_value
 
-        low_pass_filtered_value = np.mean(self.low_pass_window)
+        return (np.mean(self.low_pass_window))
 
     def do_pre_processing(self, current_value):
         self.high_pass_filtered_value = self.do_high_pass_filtering(current_value)
-        self.stop_band_filtered_value = self.do_stop_band_filtering(high_pass_filtered_value)
-        self.enve_lowp_filtered_value = self.do_low_pass_filtering(np.abs(stop_band_filtered_value))
+        self.stop_band_filtered_value = self.do_stop_band_filtering(self.high_pass_filtered_value)
+        self.enve_lowp_filtered_value = self.do_low_pass_filtering(np.abs(self.stop_band_filtered_value))
 
     def start_saving_to_file_routine(self, file_name):
         # Open file

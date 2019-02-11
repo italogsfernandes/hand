@@ -187,11 +187,15 @@ class ArduinoHandler:
                 _starter_byte = self.serialPort.read()
                 if chr(ord(_starter_byte)) == ArduinoConstants.PACKET_START:
                     if self.qnt_ch == 1:
+                        _value_to_put = []
                         _msb = self.serialPort.read()
                         _lsb = self.serialPort.read()
                         _msb = ord(_msb)
                         _lsb = ord(_lsb)
-                        _value_to_put = ArduinoHandler.to_int16(_msb, _lsb)
+                        _value_to_put.append(ArduinoHandler.to_int16(_msb, _lsb))
+                        _value_to_put.append(0)
+                        _value_to_put.append(0)
+                        _value_to_put.append(0)
                     else:
                         _value_to_put = []
                         for n in range(self.qnt_ch):

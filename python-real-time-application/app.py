@@ -155,6 +155,15 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.emg_app.simple_mode = self.checkBox_simple_mode.isEnabled()
         if self.emg_app.simple_mode:
             self.emg_app.arduinoHandler.qnt_ch = 1 #TODO: find out if this will work
+            self.cb_ch1.setText(u'Raw EMG')
+            self.cb_ch2.setText(u'HP 3.2Hz')
+            self.cb_ch3.setText(u'SB 50Hz')
+            self.cb_ch4.setText(u'ENV 10Hz')
+        else:
+            self.cb_ch1.setText(u'CH1')
+            self.cb_ch2.setText(u'CH2')
+            self.cb_ch3.setText(u'CH3')
+            self.cb_ch4.setText(u'CH4')
 
     def using_simulation_toggled(self, new_state):
         #self.emg_app.data_from_simulation = new_state
