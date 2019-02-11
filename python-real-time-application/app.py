@@ -70,8 +70,8 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.servo_controller = ArduinoOutputController()
         # Object to acquire EMG signals and plot it (using the serial port).
         self.emg_app = ArduinoEMGPlotter(parent=self.centralwidget,label=self.lbl_status)
-        self.contraction_started_routine = self.do_start_contraction_event
-        self.contraction_finished_routine = self.do_finish_contraction_event
+        self.emg_app.contraction_started_routine = self.do_start_contraction_event
+        self.emg_app.contraction_finished_routine = self.do_finish_contraction_event
         ####################
         ###### Some Ui modifications
         ### Combo box features
@@ -159,7 +159,8 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         #self.emg_app.simple_mode = new_state
         self.emg_app.simple_mode = self.checkBox_simple_mode.isEnabled()
         if self.emg_app.simple_mode:
-            self.emg_app.plotHandler.plotWidget.setYRange(-0.2, 0.2)
+            self.emg_app.plotHandler.plotWidget.setYRange(-0.5, 0.5)
+            self.horizontalSlider_threshold.setMaximum(int(0.5*100))
             self.emg_app.arduinoHandler.qnt_ch = 1 #TODO: find out if this will work
             self.cb_ch1.setText(u'Raw EMG')
             self.cb_ch3.setText(u'HP 3.2Hz')
@@ -174,6 +175,8 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
     def using_simulation_toggled(self, new_state):
         #self.emg_app.data_from_simulation = new_state
         self.emg_app.data_from_simulation = self.checkBox_simulation.isEnabled()
+        self.emg_app.plotHandler.plotWidget.setYRange(-0.2, 0.2)
+
 
     def btn_laser_clicked(self):
         self.servo_controller.send_cmd_laser()

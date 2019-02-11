@@ -130,7 +130,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         #########################
         # High Pass Filter (Envelope)
         #########################
-        self.low_pass_mva_window_size = 32 # 10Hz
+        self.low_pass_mva_window_size = 128 # 10Hz
         self.low_pass_window = np.zeros(self.low_pass_mva_window_size, dtype=np.float64)
         #################################
         self.high_pass_filtered_value = 0
@@ -202,6 +202,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.high_pass_filtered_value = self.do_high_pass_filtering(current_value)
         self.stop_band_filtered_value = self.do_stop_band_filtering(self.high_pass_filtered_value)
         self.enve_lowp_filtered_value = self.do_low_pass_filtering(np.abs(self.stop_band_filtered_value))
+        self.enve_lowp_filtered_value *= 3
 
     def start_saving_to_file_routine(self, file_name):
         # Open file
