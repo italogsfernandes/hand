@@ -83,6 +83,18 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
                                    "SSC - Slope Signal Change"))
         self.cb_features.currentIndex = 0
 
+        ################
+        #Extra haha
+        self.comboBox_movimentfinal.addItems(("Close Hand",
+                                   "Honnor",
+                                   "Pointer",
+                                   "Spider-Man",
+                                   "Come In",
+                                   "V",
+                                   "Extra 6",
+                                   "Extra 7"))
+        self.comboBox_movimentfinal.setCurrentIndex(0)
+
         #### Chart EMG
         # Adding object to a specific place in the layout
         self.verticalLayoutGraph.addWidget(self.emg_app.plotHandler.plotWidget)
@@ -144,13 +156,88 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.checkBox_simulation.toggled.connect(self.using_simulation_toggled)
         self.checkBox_simple_mode.toggled.connect(self.do_simple_mode)
         self.horizontalSlider_threshold.valueChanged.connect(self.threshold_changed)
+        self.pushButton_forhonnor.clicked.connect(self.forhonnor_clicked)
+        self.pushButton_pointer.clicked.connect(self.pointer_clicked)
+        self.pushButton_spiderman.clicked.connect(self.spiderman_clicked)
+        self.pushButton_comein.clicked.connect(self.comein_clicked)
+        self.pushButton_v.clicked.connect(self.v_clicked)
+        self.pushButton_extra6.clicked.connect(self.extra6_clicked)
+        self.pushButton_extra7.clicked.connect(self.extra7_clicked)
+
+    def forhonnor_clicked(self):
+        self.h_slider_1.setValue(90)
+        self.h_slider_2.setValue(90)
+        self.h_slider_3.setValue(0)
+        self.h_slider_4.setValue(90)
+        self.h_slider_5.setValue(90)
+        self.btn_send_position_clicked()
+    def pointer_clicked(self):
+        self.h_slider_1.setValue(90)
+        self.h_slider_2.setValue(0)
+        self.h_slider_3.setValue(90)
+        self.h_slider_4.setValue(90)
+        self.h_slider_5.setValue(90)
+        self.btn_send_position_clicked()
+    def spiderman_clicked(self):
+        self.h_slider_1.setValue(90)
+        self.h_slider_2.setValue(0)
+        self.h_slider_3.setValue(90)
+        self.h_slider_4.setValue(90)
+        self.h_slider_5.setValue(0)
+        self.btn_send_position_clicked()
+    def comein_clicked(self):
+        self.h_slider_1.setValue(90)
+        self.h_slider_2.setValue(0)
+        self.h_slider_3.setValue(90)
+        self.h_slider_4.setValue(90)
+        self.h_slider_5.setValue(90)
+        self.btn_send_position_clicked()
+    def v_clicked(self):
+        self.h_slider_1.setValue(90)
+        self.h_slider_2.setValue(0)
+        self.h_slider_3.setValue(0)
+        self.h_slider_4.setValue(90)
+        self.h_slider_5.setValue(90)
+        self.btn_send_position_clicked()
+    def extra6_clicked(self):
+        self.h_slider_1.setValue(90)
+        self.h_slider_2.setValue(90)
+        self.h_slider_3.setValue(90)
+        self.h_slider_4.setValue(90)
+        self.h_slider_5.setValue(90)
+        self.btn_send_position_clicked()
+    def extra7_clicked(self):
+        self.h_slider_1.setValue(90)
+        self.h_slider_2.setValue(90)
+        self.h_slider_3.setValue(90)
+        self.h_slider_4.setValue(90)
+        self.h_slider_5.setValue(90)
+        self.btn_send_position_clicked()
 
     def threshold_changed(self):
         self.emg_app.simple_threshold = self.horizontalSlider_threshold.value() / 100.0
         self.label_2.setText(str(self.emg_app.simple_threshold))
 
     def do_start_contraction_event(self):
-        self.btn_close_position_clicked()
+        mv_selected = str(self.comboBox_movimentfinal.itemText(self.comboBox_movimentfinal.currentIndex())))
+        if mv_selected == "Close Hand":
+            self.btn_close_position_clicked()
+        elif mv_selected == "Honnor":
+            self.forhonnor_clicked()
+        elif mv_selected == "Pointer":
+            self.pointer_clicked()
+        elif mv_selected == "Spider-Man":
+            self.spiderman_clicked()
+        elif mv_selected == "Come In":
+            self.comein_clicked()
+        elif mv_selected == "V":
+            self.v_clicked()
+        elif mv_selected == "Extra 6":
+            self.extra6_clicked()
+        elif mv_selected == "Extra 7":
+            self.extra7_clicked()
+        else:
+            self.btn_close_position_clicked()
 
     def do_finish_contraction_event(self):
         self.btn_reset_position_clicked()

@@ -36,7 +36,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_EMG">
        <attribute name="title">
@@ -220,6 +220,9 @@
             <property name="topMargin">
              <number>0</number>
             </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QGroupBox" name="groupBox_f1">
               <property name="title">
@@ -348,6 +351,84 @@
                   <string>Send</string>
                  </property>
                 </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_3">
+              <property name="title">
+               <string>Extra</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_14">
+               <property name="bottomMargin">
+                <number>9</number>
+               </property>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_14">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_forhonnor">
+                   <property name="text">
+                    <string>For Honnor</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_pointer">
+                   <property name="text">
+                    <string>Pointer</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_spiderman">
+                   <property name="text">
+                    <string>Spider-Man</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_comein">
+                   <property name="text">
+                    <string>Come In</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_16">
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_v">
+                   <property name="text">
+                    <string>V</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_extra6">
+                   <property name="text">
+                    <string>Extra 6</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_extra7">
+                   <property name="text">
+                    <string>Extra 7</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboBox_movimentfinal"/>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
