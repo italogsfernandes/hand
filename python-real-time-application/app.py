@@ -143,6 +143,11 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.btn_laser.clicked.connect(self.btn_laser_clicked)
         self.checkBox_simulation.toggled.connect(self.using_simulation_toggled)
         self.checkBox_simple_mode.toggled.connect(self.do_simple_mode)
+        self.horizontalSlider_threshold.valueChanged.connect(self.threshold_changed)
+
+    def threshold_changed(self):
+        self.emg_app.simple_threshold = self.horizontalSlider_threshold.value() / 100.0
+        self.label_2.setText(str(self.emg_app.simple_threshold))
 
     def do_start_contraction_event(self):
         self.btn_close_position_clicked()
@@ -154,15 +159,16 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         #self.emg_app.simple_mode = new_state
         self.emg_app.simple_mode = self.checkBox_simple_mode.isEnabled()
         if self.emg_app.simple_mode:
+            self.emg_app.plotHandler.plotWidget.setYRange(-0.2, 0.2)
             self.emg_app.arduinoHandler.qnt_ch = 1 #TODO: find out if this will work
             self.cb_ch1.setText(u'Raw EMG')
-            self.cb_ch2.setText(u'HP 3.2Hz')
-            self.cb_ch3.setText(u'SB 50Hz')
+            self.cb_ch3.setText(u'HP 3.2Hz')
+            self.cb_ch2.setText(u'SB 50Hz')
             self.cb_ch4.setText(u'ENV 10Hz')
         else:
             self.cb_ch1.setText(u'CH1')
-            self.cb_ch2.setText(u'CH2')
-            self.cb_ch3.setText(u'CH3')
+            self.cb_ch3.setText(u'CH2')
+            self.cb_ch2.setText(u'CH3')
             self.cb_ch4.setText(u'CH4')
 
     def using_simulation_toggled(self, new_state):
@@ -211,17 +217,17 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
             port_out_name = port_out_name.split()[0]
             try:
                 self.servo_controller.open_port(port_out_name)
+                self.tabWidget.setCurrentIndex(3)
             except Exception as e:
                 self.statusbar.showMessage("Not possible to connect. Please verify USB connection.")
-            self.tabWidget.setCurrentIndex(3)
 
         if port_in_name != "None":
             port_in_name = port_in_name.split()[0]
             self.emg_app.arduinoHandler.update_port_name(port_in_name)
-            self.tabWidget.setCurrentIndex(0)
             try:
                 self.emg_app.start()
                 self.actionStartAcquisition.setText("Stop Acquisition")
+                self.tabWidget.setCurrentIndex(0)
             except Exception as e:
                 self.statusbar.showMessage("Not possible to start. Please verify USB connection.")
 

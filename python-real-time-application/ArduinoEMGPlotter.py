@@ -137,9 +137,9 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
         self.stop_band_filtered_value = 0
         self.enve_lowp_filtered_value = 0
 
-        self.simple_threshould = 1
-        self.is_above_threshould = False
-        self.was_above_threshould = False
+        self.simple_threshold = 1
+        self.is_above_threshold = False
+        self.was_above_threshold = False
         ################################
         self.contraction_started_routine = None
         self.contraction_finished_routine = None
@@ -412,15 +412,15 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                 ####################
                 # Analysing envelope
                 ####################
-                self.is_above_threshould = self.enve_lowp_filtered_value > self.simple_threshould
+                self.is_above_threshold = self.enve_lowp_filtered_value > self.simple_threshold
                 ################################################################
                 ################################################################
                 ################################################################
-                if self.is_above_threshould and not self.was_above_threshould:
+                if self.is_above_threshold and not self.was_above_threshold:
                     print("Starting Contraction...")
                     if self.contraction_started_routine is not None:
                         self.contraction_started_routine()
-                if not self.is_above_threshould and self.was_above_threshould:
+                if not self.is_above_threshold and self.was_above_threshold:
                     print("Finishing Contraction...")
                     if self.contraction_finished_routine is not None:
                         self.contraction_finished_routine()
@@ -428,7 +428,7 @@ class ArduinoEMGPlotter(QtArduinoPlotter):
                 ################################################################
                 ################################################################
                 ################################################################
-                self.was_above_threshould = self.is_above_threshould
+                self.was_above_threshold = self.is_above_threshold
 
             if not self.simple_mode:
                 if self.saving_to_file:
