@@ -125,6 +125,9 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.emg_app.feature_plot_handler.series[3].set_visible(True) # 0.9
         self.emg_app.feature_plot_handler.series[4].set_visible(True) # 55.0
         self.emg_app.feature_plot_handler.series[5].set_visible(True) # 150.0
+        #####################
+        self.checkBox_simple_mode.toggle()
+        self.horizontalSlider_threshold.setValue(int(0.04*100))
 
     def setup_signals_connections(self):
         """ Connects the events of objects in the view (buttons, combobox, etc)
@@ -219,7 +222,7 @@ class HandProjectApp(QMainWindow, base.Ui_MainWindow):
         self.label_2.setText(str(self.emg_app.simple_threshold))
 
     def do_start_contraction_event(self):
-        mv_selected = str(self.comboBox_movimentfinal.itemText(self.comboBox_movimentfinal.currentIndex())))
+        mv_selected = str(self.comboBox_movimentfinal.itemText(self.comboBox_movimentfinal.currentIndex()))
         if mv_selected == "Close Hand":
             self.btn_close_position_clicked()
         elif mv_selected == "Honnor":
